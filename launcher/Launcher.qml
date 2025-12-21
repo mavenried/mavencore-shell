@@ -11,10 +11,12 @@ import qs
 Scope {
     id: root
     property bool open: false
+    property bool cmdMode: false
+
     property var apps: []
     property var searchText: ""
     property var filtered: {
-        if (searchText.trim() === "")
+        if (searchText.trim() === "" || root.cmdMode)
             return [];
         return root.apps.filter(a => a.name.toLowerCase().trim().includes(searchText.toLowerCase().trim()));
     }
@@ -22,7 +24,7 @@ Scope {
     Process {
         id: proc
         command: ["sh", "-c", "mavencore apps-list"]
-        running: true
+        running: false
         stdout: SplitParser {
             onRead: function (data) {
                 try {
@@ -33,18 +35,20 @@ Scope {
             }
         }
     }
+
     IpcHandler {
+        id: handler
         target: "launcher"
         function open() {
-            console.log("opening runner.");
             root.open = true;
             proc.running = true;
             root.apps = [];
-            root.searchText = "";
         }
+
         function close() {
-            console.log("closing runner.");
             root.open = false;
+            root.apps = [];
+            root.searchText = "";
         }
     }
     LazyLoader {
@@ -66,7 +70,7 @@ Scope {
                 id: inner
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 700
-                implicitHeight: search.implicitHeight + list.implicitHeight + 10
+                implicitHeight: col.height//search.implicitHeight + list.implicitHeight
                 anchors.margins: 10
                 anchors.bottom: parent.bottom
                 radius: Theme.radius
@@ -77,11 +81,15 @@ Scope {
                     console.log("Key pressed:", event.key);
                     if (event.key === Qt.Key_Escape) {
                         console.log("Escape pressed!");
-                        root.open = false;
+                        handler.close();
                     } else if (event.key === Qt.Key_Return) {
-                        let path = root.filtered[list.currentIndex].path;
-                        Quickshell.execDetached(["gio", "launch", path]);
-                        root.open = false;
+                        if (!root.cmdMode) {
+                            let path = root.filtered[list.currentIndex].path;
+                            Quickshell.execDetached(["gio", "launch", path]);
+                        } else {
+                            Quickshell.execDetached(["sh", "-c", root.searchText.slice(1)]);
+                        }
+                        handler.close();
                     } else if (event.key === Qt.Key_Tab) {
                         list.currentIndex = (list.currentIndex + 1) % list.count;
                     } else if (event.key === Qt.Key_Backtab) {
@@ -91,8 +99,8 @@ Scope {
                     }
                 }
                 ColumnLayout {
-                    spacing: 0
-
+                    id: col
+                    spacing: list.count > 0 ? 5 : 0
                     ListView {
                         id: list
                         implicitWidth: 700
@@ -109,27 +117,42 @@ Scope {
                         currentIndex: 0
 
                         delegate: Rectangle {
+                            id: item
                             required property var modelData
 
                             width: ListView.view.width
                             height: 50
-                            color: ListView.isCurrentItem ? Theme.acct : "transparent"
-                            radius: 10
-
-                            Text {
+                            color: ListView.isCurrentItem ? Qt.rgba(0, 0, 0, 0.5) : "transparent"
+                            radius: 15
+                            border.width: 2
+                            border.color: ListView.isCurrentItem ? Theme.acct : "transparent"
+                            Row {
+                                height: name.implicitHeight
                                 anchors.verticalCenter: parent.verticalCenter
+                                width: name.implicitWidth
                                 leftPadding: 10
-                                text: parent.modelData.name
-                                font.pixelSize: 20
-                                font.family: "JetbrainsMono Nerd Font"
-                                color: parent.ListView.isCurrentItem ? Theme.bgnd : Theme.txt1
+
+                                Image {
+                                    property string iconName: item.modelData.icon
+                                    fillMode: Image.PreserveAspectFit
+                                    source: "image://icon/" + iconName
+                                    height: name.implicitHeight
+                                    width: name.implicitHeight
+                                }
+                                Text {
+                                    id: name
+                                    leftPadding: 10
+                                    text: item.modelData.name
+                                    font.pixelSize: 20
+                                    font.family: "JetbrainsMono Nerd Font"
+                                    color: item.ListView.isCurrentItem ? Theme.txt1 : Theme.txt1
+                                }
                             }
                         }
                     }
 
                     Rectangle {
                         id: search
-                        Layout.margins: 5
                         implicitHeight: text.implicitHeight
                         color: "transparent"
                         TextField {
@@ -138,19 +161,23 @@ Scope {
                             focus: true
                             placeholderText: "Search..."
                             placeholderTextColor: Theme.txt2
-                            cursorVisible: false
                             font.pixelSize: 20
                             font.family: "JetbrainsMono Nerd Font"
                             color: Theme.txt1
                             background: Rectangle {
                                 color: Qt.rgba(0, 0, 0, 0.5)
-                                radius: 10
-                                border.color: Theme.acct
+                                radius: 15
+                                border.color: root.cmdMode ? Theme.wifi : Theme.acct
                                 border.width: 2
-                                width: 690
+                                width: 700
                             }
                             onTextChanged: function () {
                                 root.searchText = this.text;
+                                if (root.searchText.startsWith(":")) {
+                                    root.cmdMode = true;
+                                } else {
+                                    root.cmdMode = false;
+                                }
                             }
                         }
                     }
