@@ -59,7 +59,7 @@ Scope {
                         id: inner
                         spacing:-4;
                         Module {
-                            label:  "<b>" +(CompositorIpc.state.workspaces.indexOf(CompositorIpc.state.workspace_id) + 1) + "</b"
+                            label:  "<b>" +(CompositorIpc.state.workspaces.indexOf(CompositorIpc.state.workspace_id) + 1) + "</b>"
                             labelColor: Theme.wksp
                             drawBox: false
                         }

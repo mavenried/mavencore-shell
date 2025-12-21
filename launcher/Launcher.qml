@@ -13,7 +13,7 @@ Scope {
     property bool open: false
     property var apps: []
     property var searchText: ""
-    property var filteredApps: {
+    property var filtered: {
         if (searchText.trim() === "")
             return [];
         return root.apps.filter(a => a.name.toLowerCase().trim().includes(searchText.toLowerCase().trim()));
@@ -79,7 +79,7 @@ Scope {
                         console.log("Escape pressed!");
                         root.open = false;
                     } else if (event.key === Qt.Key_Return) {
-                        let path = root.filteredApps[list.currentIndex].path;
+                        let path = root.filtered[list.currentIndex].path;
                         Quickshell.execDetached(["gio", "launch", path]);
                         root.open = false;
                     } else if (event.key === Qt.Key_Tab) {
@@ -99,7 +99,13 @@ Scope {
                         implicitHeight: this.count < 10 ? this.count * 50 : 500
                         clip: true
 
-                        model: root.filteredApps
+                        Behavior on implicitHeight {
+                            NumberAnimation {
+                                duration: 100
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                        model: root.filtered
                         currentIndex: 0
 
                         delegate: Rectangle {

@@ -40,11 +40,9 @@ Rectangle {
 
         Behavior on width {
             NumberAnimation {
-                duration: 200 // Animation duration
+                duration: 200
+                easing.type: Easing.InOutQuad
             }
-
         }
-
     }
-
 }
