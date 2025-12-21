@@ -49,6 +49,7 @@ Scope {
             root.open = false;
             root.apps = [];
             root.searchText = "";
+            root.cmdMode = false;
         }
     }
     LazyLoader {
