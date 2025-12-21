@@ -16,7 +16,7 @@ Scope {
     property var filteredApps: {
         if (searchText.trim() === "")
             return [];
-        return root.apps.filter(a => a.name.toLowerCase().trim().includes(this.text.toLowerCase().trim()));
+        return root.apps.filter(a => a.name.toLowerCase().trim().includes(searchText.toLowerCase().trim()));
     }
 
     Process {
@@ -25,10 +25,8 @@ Scope {
         running: true
         stdout: SplitParser {
             onRead: function (data) {
-                // console.log(data);
                 try {
                     root.apps = root.apps.concat([JSON.parse(data)]);
-                    // console.log(JSON.stringify(root.apps));
                 } catch (e) {
                     console.error(e);
                 }
@@ -41,8 +39,9 @@ Scope {
             console.log("opening runner.");
             root.open = true;
             proc.running = true;
+            root.apps = [];
+            root.searchText = "";
         }
-
         function close() {
             console.log("closing runner.");
             root.open = false;
@@ -54,7 +53,8 @@ Scope {
             id: runnerWindow
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-            implicitHeight: inner.height + 100
+            implicitHeight: 600
+
             anchors {
                 bottom: true
                 left: true
@@ -63,9 +63,10 @@ Scope {
             exclusiveZone: -1
             color: "transparent"
             Rectangle {
+                id: inner
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 700
-                implicitHeight: inner.height
+                implicitHeight: search.implicitHeight + list.implicitHeight + 10
                 anchors.margins: 10
                 anchors.bottom: parent.bottom
                 radius: Theme.radius
@@ -77,14 +78,54 @@ Scope {
                     if (event.key === Qt.Key_Escape) {
                         console.log("Escape pressed!");
                         root.open = false;
+                    } else if (event.key === Qt.Key_Return) {
+                        let path = root.filteredApps[list.currentIndex].path;
+                        Quickshell.execDetached(["gio", "launch", path]);
+                        root.open = false;
+                    } else if (event.key === Qt.Key_Tab) {
+                        list.currentIndex = (list.currentIndex + 1) % list.count;
+                    } else if (event.key === Qt.Key_Backtab) {
+                        list.currentIndex = (list.currentIndex - 1) % list.count;
+                        if (list.currentIndex < 0)
+                            list.currentIndex = list.count - 1;
                     }
                 }
                 ColumnLayout {
-                    id: inner
+                    spacing: 0
+
+                    ListView {
+                        id: list
+                        implicitWidth: 700
+                        implicitHeight: this.count < 10 ? this.count * 50 : 500
+                        clip: true
+
+                        model: root.filteredApps
+                        currentIndex: 0
+
+                        delegate: Rectangle {
+                            required property var modelData
+
+                            width: ListView.view.width
+                            height: 50
+                            color: ListView.isCurrentItem ? Theme.acct : "transparent"
+                            radius: 10
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                leftPadding: 10
+                                text: parent.modelData.name
+                                font.pixelSize: 20
+                                font.family: "JetbrainsMono Nerd Font"
+                                color: parent.ListView.isCurrentItem ? Theme.bgnd : Theme.txt1
+                            }
+                        }
+                    }
 
                     Rectangle {
+                        id: search
                         Layout.margins: 5
                         implicitHeight: text.implicitHeight
+                        color: "transparent"
                         TextField {
                             id: text
                             padding: 10
@@ -96,41 +137,14 @@ Scope {
                             font.family: "JetbrainsMono Nerd Font"
                             color: Theme.txt1
                             background: Rectangle {
-                                color: Theme.bgnd
-                                border.color: Theme.accent
+                                color: Qt.rgba(0, 0, 0, 0.5)
                                 radius: 10
+                                border.color: Theme.acct
+                                border.width: 2
                                 width: 690
                             }
                             onTextChanged: function () {
                                 root.searchText = this.text;
-                            }
-                        }
-                    }
-
-                    ListView {
-                        id: list
-                        Layout.margins: 5
-                        width: 690
-                        height: 500
-                        clip: true
-
-                        model: root.filteredApps
-                        currentIndex: 0
-
-                        delegate: Rectangle {
-                            required property var modelData
-
-                            width: ListView.view.width
-                            height: 50
-                            color: ListView.isCurrentItem ? Theme.accent : "transparent"
-
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                leftPadding: 10
-                                text: modelData.name
-                                font.pixelSize: 20
-                                font.family: "JetbrainsMono Nerd Font"
-                                color: Theme.txt1
                             }
                         }
                     }
