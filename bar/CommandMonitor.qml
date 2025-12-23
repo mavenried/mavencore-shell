@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Io
+import Quickshell
 
 Item {
     id: root
@@ -9,14 +10,14 @@ Item {
     property color labelColor
     property int interval: 500
     property list<string> command
+    property list<string> onclick
     property bool drawBox: true
 
     function fmt(template, value) {
-        return template.replace(/%(-?\d*)s/g, function(_, widthSpec) {
+        return template.replace(/%(-?\d*)s/g, function (_, widthSpec) {
             const width = parseInt(widthSpec, 10);
             if (!width || isNaN(width))
                 return value;
- // plain %s
             if (width > 0)
                 return value.toString().padStart(width, " ");
 
@@ -37,6 +38,15 @@ Item {
         labelColor: root.labelColor
         drawBox: root.drawBox
     }
+    MouseArea {
+        width: content.width
+        height: content.height
+
+        onClicked: {
+            console.log(root.onclick);
+            Quickshell.execDetached(root.onclick);
+        }
+    }
 
     Process {
         id: updater
@@ -47,7 +57,6 @@ Item {
         stdout: StdioCollector {
             onStreamFinished: root.label = root.fmt(root.template, this.text.trim())
         }
-
     }
 
     Timer {
@@ -56,5 +65,4 @@ Item {
         repeat: true
         onTriggered: updater.running = true
     }
-
 }

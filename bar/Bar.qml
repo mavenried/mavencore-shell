@@ -39,6 +39,7 @@ Scope {
                 CommandMonitor {
                     labelColor: Theme.dstr
                     command: ["zsh", "-c", "checkupdates | wc -l "]
+                    onclick: ["ghostty", "-e", "yay", "-Syu", "--noconfirm"]
                     template: " %3s"
                     label: " ---"
                     interval: 5000
@@ -57,9 +58,9 @@ Scope {
                     radius: Theme.radius
                     Row {
                         id: inner
-                        spacing:-4;
+                        spacing: -4
                         Module {
-                            label:  "<b>" +(CompositorIpc.state.workspaces.indexOf(CompositorIpc.state.workspace_id) + 1) + "</b>"
+                            label: "<b>" + (CompositorIpc.state.workspaces.indexOf(CompositorIpc.state.workspace_id) + 1) + "</b>"
                             labelColor: Theme.wksp
                             drawBox: false
                         }
