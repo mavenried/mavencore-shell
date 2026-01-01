@@ -12,12 +12,21 @@ Scope {
     id: root
     property bool open: false
     property bool cmdMode: false
+    property bool clcMode: false
+    property string clcResult: ""
 
     property var apps: []
     property var searchText: ""
     property var filtered: {
         if (searchText.trim() === "" || root.cmdMode)
             return [];
+        if (root.clcMode)
+            return [
+                {
+                    name: root.clcResult,
+                    icon: ""
+                }
+            ];
         return root.apps.filter(a => a.name.toLowerCase().trim().includes(searchText.toLowerCase().trim()));
     }
 
@@ -32,6 +41,21 @@ Scope {
                 } catch (e) {
                     console.error(e);
                 }
+            }
+        }
+    }
+
+    Process {
+        id: calc
+        command: ["sh", "-c", "qalc '" + root.searchText.slice(1) + "'"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: function () {
+                console.log(this.text);
+                if (this.text.trim().split(/\r?\n/).length != 1)
+                    root.clcResult = "Error";
+                else
+                    root.clcResult = this.text.trim();
             }
         }
     }
@@ -52,6 +76,7 @@ Scope {
             root.apps = [];
             root.searchText = "";
             root.cmdMode = false;
+            root.clcMode = false;
         }
     }
     Timer {
@@ -102,13 +127,13 @@ Scope {
                         console.log("Escape pressed!");
                         handler.close();
                     } else if (event.key === Qt.Key_Return) {
-                        if (!root.cmdMode) {
+                        if (!root.cmdMode && !root.clcMode) {
                             let path = root.filtered[list.currentIndex].path;
                             Quickshell.execDetached(["gio", "launch", path]);
-                        } else {
+                        } else if (root.cmdMode) {
                             Quickshell.execDetached(["sh", "-c", root.searchText.slice(1)]);
+                            handler.close();
                         }
-                        handler.close();
                     } else if (event.key === Qt.Key_Tab) {
                         list.currentIndex = (list.currentIndex + 1) % list.count;
                     } else if (event.key === Qt.Key_Backtab) {
@@ -154,6 +179,7 @@ Scope {
                                 Image {
                                     property string iconName: item.modelData.icon
                                     fillMode: Image.PreserveAspectFit
+                                    visible: iconName != ""
                                     source: "image://icon/" + iconName
                                     height: name.implicitHeight
                                     width: name.implicitHeight
@@ -178,7 +204,7 @@ Scope {
                             id: text
                             padding: 10
                             focus: true
-                            placeholderText: "Search..."
+                            placeholderText: "Search? Run? Calculate? What is it now?"
                             placeholderTextColor: Theme.txt2
                             font.pixelSize: 20
                             font.family: "JetbrainsMono Nerd Font"
@@ -186,7 +212,7 @@ Scope {
                             background: Rectangle {
                                 color: Qt.rgba(0, 0, 0, 0.5)
                                 radius: 15
-                                border.color: root.cmdMode ? Theme.wifi : Theme.acct
+                                border.color: root.cmdMode ? Theme.wifi : root.clcMode ? Theme.acct : Theme.acct
                                 border.width: 2
                                 width: 700
                             }
@@ -194,8 +220,15 @@ Scope {
                                 root.searchText = this.text;
                                 if (root.searchText.startsWith(":")) {
                                     root.cmdMode = true;
+                                    root.clcMode = false;
+                                } else if (root.searchText.startsWith("=")) {
+                                    root.cmdMode = false;
+                                    root.clcMode = true;
+                                    calc.running = false;
+                                    calc.running = true;
                                 } else {
                                     root.cmdMode = false;
+                                    root.clcMode = false;
                                 }
                             }
                         }
