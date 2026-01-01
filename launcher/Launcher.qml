@@ -40,24 +40,33 @@ Scope {
         id: handler
         target: "launcher"
         function open() {
+            loader.active = true;
             root.open = true;
             proc.running = true;
             root.apps = [];
         }
 
         function close() {
+            closeTimer.start();
             root.open = false;
             root.apps = [];
             root.searchText = "";
             root.cmdMode = false;
         }
     }
+    Timer {
+        id: closeTimer
+        interval: 300
+        onTriggered: {
+            loader.active = root.open;
+        }
+    }
     LazyLoader {
-        active: root.open
+        id: loader
         PanelWindow {
             id: runnerWindow
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
             implicitHeight: 600
 
             anchors {
@@ -78,6 +87,15 @@ Scope {
                 color: Theme.bgnd
                 border.color: Theme.acct
                 border.width: 2
+
+                opacity: root.open ? 1 : 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 100
+                    }
+                }
+
                 Keys.onPressed: function (event) {
                     console.log("Key pressed:", event.key);
                     if (event.key === Qt.Key_Escape) {
