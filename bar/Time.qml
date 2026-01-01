@@ -1,12 +1,12 @@
+pragma Singleton
 import QtQuick
 import Quickshell
-pragma Singleton
 
 Singleton {
     id: root
 
     readonly property string time: {
-        Qt.formatDateTime(clock.date, "<b> hh:mm:ss</b> dd|M|yy ddd");
+        Qt.formatDateTime(clock.date, "<b> hh:mm:ss</b> dd|MM|yy ddd");
     }
 
     SystemClock {
@@ -14,5 +14,4 @@ Singleton {
 
         precision: SystemClock.Seconds
     }
-
 }
