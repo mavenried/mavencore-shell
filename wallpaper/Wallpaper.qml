@@ -34,9 +34,9 @@ Scope {
             OpacityAnimator {
                 id: fadeIn
                 target: img
-                duration: 10000
+                duration: 1000
                 from: 0
-                to: 100
+                to: 1
                 easing.type: Easing.InOutQuad
             }
             IpcHandler {
