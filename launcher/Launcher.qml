@@ -105,7 +105,7 @@ Scope {
                 id: inner
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 700
-                implicitHeight: col.height//search.implicitHeight + list.implicitHeight
+                implicitHeight: col.height
                 anchors.margins: 10
                 anchors.bottom: parent.bottom
                 radius: Theme.radius
@@ -116,7 +116,7 @@ Scope {
                 opacity: root.open ? 1 : 0
 
                 Behavior on opacity {
-                    NumberAnimation {
+                    OpacityAnimator {
                         duration: 100
                     }
                 }
@@ -132,8 +132,8 @@ Scope {
                             Quickshell.execDetached(["gio", "launch", path]);
                         } else if (root.cmdMode) {
                             Quickshell.execDetached(["sh", "-c", root.searchText.slice(1)]);
-                            handler.close();
                         }
+                        handler.close();
                     } else if (event.key === Qt.Key_Tab) {
                         list.currentIndex = (list.currentIndex + 1) % list.count;
                     } else if (event.key === Qt.Key_Backtab) {

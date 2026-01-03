@@ -67,7 +67,7 @@ Scope {
                         Module {
                             label: root.truncate(CompositorIpc.state.window_name)
                             labelColor: Theme.name
-                            color: Theme.wksp
+                            color: Theme.bgnd
                             drawBox: true
                         }
                     }
