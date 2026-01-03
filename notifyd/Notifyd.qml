@@ -13,10 +13,9 @@ Scope {
     IpcHandler {
         target: "notifyd"
         function clear() {
-            console.log("Clearing all notifications.");
+            console.debug("Clearing all notifications.");
             while (server.trackedNotifications.values.length > 0) {
                 server.trackedNotifications.values.forEach(function (notif: Notification) {
-                    console.log(notif.summary);
                     notif.tracked = false;
                 });
             }
@@ -32,6 +31,7 @@ Scope {
         if (value.startsWith("/") || value.startsWith("image://"))
             return value;
 
+        console.warn("Notification image was " + value);
         return "";
     }
 
@@ -44,7 +44,7 @@ Scope {
         onNotification: function (notification) {
             notification.tracked = true;
             notification.timestamp = Date.now();
-            console.log("Got: [" + notification.appIcon + ", " + notification.image + "]: " + notification.summary + " | " + notification.body);
+            console.debug("Got: [" + notification.appIcon + ", " + notification.image + "]: " + notification.summary + " | " + notification.body);
         }
     }
 
