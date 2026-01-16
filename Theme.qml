@@ -27,5 +27,4 @@ Singleton {
     readonly property color bat5: "#ab4642"
     readonly property color acct: "#141414"
     readonly property int radius: 15
-
 }
