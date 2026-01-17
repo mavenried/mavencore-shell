@@ -18,8 +18,8 @@ Scope {
         id: handler
         target: "scratchpad"
         function open() {
-            root.open = true;
             loader.active = true;
+            root.open = true;
         }
 
         function close() {
@@ -29,7 +29,7 @@ Scope {
     }
     Timer {
         id: closeTimer
-        interval: 300
+        interval: 250
         onTriggered: {
             loader.active = root.open;
         }
@@ -52,21 +52,19 @@ Scope {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-            implicitHeight: 700
-
             anchors {
                 top: true
                 left: true
+                bottom: true
                 right: true
             }
             exclusiveZone: -1
             color: "transparent"
             Rectangle {
                 id: inner
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 700
-                height: 500
-                // implicitHeight: col.height
+                anchors.centerIn: parent
+                width: parent.width * 0.8
+                height: parent.height * 0.8
                 anchors.margins: 50
                 anchors.top: parent.top
                 radius: Theme.radius
@@ -78,7 +76,7 @@ Scope {
 
                 Behavior on opacity {
                     OpacityAnimator {
-                        duration: 100
+                        duration: 200
                     }
                 }
 
@@ -86,7 +84,7 @@ Scope {
                     console.log("Key pressed:", event.key);
                     if (event.key === Qt.Key_Escape) {
                         console.log("Escape pressed!");
-                        fv.setText(text.text)
+                        fv.setText(text.text);
                         handler.close();
                     }
                 }
@@ -97,7 +95,7 @@ Scope {
                     TextArea {
                         id: text
                         focus: true
-                        padding: 10
+                        padding: 20
                         text: fv.text()
 
                         font.pixelSize: 20
@@ -106,6 +104,7 @@ Scope {
                         background: Rectangle {
                             anchors.fill: parent
                             color: "transparent"
+                            border.color: Theme.acct
                             radius: 15
                             border.width: 2
                         }
