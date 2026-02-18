@@ -95,7 +95,19 @@ Scope {
                     labelColor: Theme.wifi
                     command: ["zsh", "-c", "~/.config/quickshell/scripts/qs-online"]
                     label: "󰖟 offline"
+                    onclick: ["ghostty", "-e", "nmtui"]
                     interval: 1000
+                }
+                Module {
+                    label: "󰖟 " + (Network.active ? Network.active.ssid : "---")
+                    labelColor: Theme.wifi
+                    MouseArea {
+                        onClicked: function () {
+                            if (Network.active) {
+                                log(Network.active.ssid);
+                            }
+                        }
+                    }
                 }
 
                 CommandMonitor {
@@ -112,5 +124,8 @@ Scope {
                 }
             }
         }
+    }
+    Component.onCompleted: {
+        Network.activeInterface;
     }
 }
