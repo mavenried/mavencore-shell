@@ -39,31 +39,31 @@ Scope {
         function volume_up() {
             // wpctl get-volume @DEFAULT_SINK@ | awk '{print $2 * 100}'
             console.debug("Volume Up");
-            root.icons = ["󰝟", ["󰖀", "󰕾"]];
+            root.icons = ["󰝟 ", ["󰖀 ", "󰕾 "]];
             // proc2.exec(["wpctl", "set-volume", "@DEFAULT_SINK@", "5%+"]);
             root.show_osd("wpctl set-volume --limit 1.0 @DEFAULT_SINK@ 5%+; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
         }
         function volume_down() {
             console.debug("Volume Down");
-            root.icons = ["󰝟", ["󰖀", "󰕾"]];
+            root.icons = ["󰝟 ", ["󰖀 ", "󰕾 "]];
             // proc2.exec(["wpctl", "set-volume", "@DEFAULT_SINK@", "5%-"]);
             root.show_osd("wpctl set-volume @DEFAULT_SINK@ 5%-; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
         }
         function volume_mute() {
             console.debug("Volume Mute Toggle");
-            root.icons = ["󰝟", ["󰖀", "󰕾"]];
+            root.icons = ["󰝟 ", ["󰖀 ", "󰕾 "]];
             // proc2.exec(["wpctl", "set-mute", "@DEFAULT_SINK@", "toggle"]);
             root.show_osd("wpctl set-mute @DEFAULT_SINK@ toggle; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
         }
         function brightness_up() {
             console.debug("Brightness Up");
-            root.icons = ["󰃞", ["󰃟", "󰃠"]];
+            root.icons = ["󰃞 ", ["󰃟 ", "󰃠 "]];
             // proc2.exec(["brightnessctl", "s", "+5%"]);
             root.show_osd("brightnessctl s +5% > /dev/null; brightnessctl -m | awk -F ',' '{gsub(/%/, \"\");print $4}'");
         }
         function brightness_down() {
             console.debug("Brightness Down");
-            root.icons = ["󰃞", ["󰃟", "󰃠"]];
+            root.icons = ["󰃞 ", ["󰃟 ", "󰃠 "]];
             // proc2.exec(["brightnessctl", "s", "5%-"]);
             root.show_osd("brightnessctl s 5%- > /dev/null; brightnessctl -m | awk -F ',' '{gsub(/%/, \"\");print $4}'");
         }
@@ -114,13 +114,13 @@ Scope {
             color: "transparent"
 
             anchors {
-                right: true
-                top: true
                 bottom: true
+                left: true
+                right: true
             }
 
             exclusiveZone: -1
-            width: 85
+            height: 100
             WlrLayershell.layer: WlrLayer.Overlay
             Rectangle {
                 radius: Theme.radius
@@ -131,42 +131,42 @@ Scope {
 
                 Behavior on opacity {
                     OpacityAnimator {
-                        duration: 200
+                        duration: 100
                     }
                 }
 
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
                 // width: 250
-                width: 75
-                height: icon.height + rect.height + 60
-                Column {
+                height: 75
+                width: icon.width + rect.width + 30
+                Row {
                     // width: icon.width + rect.width
-                    anchors.centerIn: parent
-                    spacing: 15
-                    Rectangle {
-                        id: rect
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        height: 165
-                        width: 10
-                        radius: 5
-                        color: Qt.rgba(55, 55, 55, 0.2)
-
-                        Rectangle {
-                            anchors.bottom: parent.bottom
-                            height: parent.height * (root.pct / 100)
-                            width: 10
-                            radius: 5
-                        }
-                    }
-
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 10
                     Text {
                         id: icon
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
                         text: root.icon
+                        onTextChanged: console.info("Icon: " + this.text)
                         font.pixelSize: 36
-                        bottomPadding: -10
+                        leftPadding: 20
                         color: Theme.clck
+                    }
+                    Rectangle {
+                        id: rect
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 165
+                        height: 5
+                        radius: 2
+                        color: Qt.rgba(0, 0, 0, 0.2)
+
+                        Rectangle {
+
+                            width: parent.width * (root.pct / 100)
+                            height: 5
+                            radius: 2
+                        }
                     }
                 }
             }
