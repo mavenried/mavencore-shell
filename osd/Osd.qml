@@ -157,6 +157,7 @@ Scope {
                             height: parent.height * (root.pct / 100)
                             width: 10
                             radius: 5
+                            color: Theme.clck
                         }
                     }
 

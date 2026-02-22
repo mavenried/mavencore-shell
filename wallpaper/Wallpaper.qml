@@ -27,7 +27,7 @@ Scope {
 
             Image {
                 id: img
-                anchors.centerIn: parent
+                anchors.fill: parent
                 source: "/mnt/DATA/Pictures/CURRENT"
             }
 

@@ -59,11 +59,11 @@ Scope {
                     radius: Theme.radius
                     Row {
                         id: inner
-                        spacing: -10
+                        spacing: -5
                         Module {
                             label: "<b>" + (CompositorIpc.state.workspaces.indexOf(CompositorIpc.state.workspace_id) + 1) + "</b>"
                             labelColor: Theme.wksp
-                            drawBox: true
+                            drawBox: false
                         }
                         Module {
                             label: root.truncate(CompositorIpc.state.window_name, 37)
