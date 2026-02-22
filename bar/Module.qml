@@ -31,7 +31,7 @@ Rectangle {
 
             text: textRoot.label
             font.pixelSize: 16
-            font.family: "JetbrainsMono Nerd Font"
+            font.family: "JetbrainsMonoNL Nerd Font"
             color: textRoot.labelColor
             padding: 8
             leftPadding: 13

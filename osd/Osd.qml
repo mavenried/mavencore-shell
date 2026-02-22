@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Wayland
 import qs
 
 Scope {
@@ -110,6 +111,7 @@ Scope {
 
             exclusiveZone: -1
             height: 100
+            WlrLayershell.layer: WlrLayer.Overlay
             Rectangle {
                 radius: Theme.radius
                 border.width: 2

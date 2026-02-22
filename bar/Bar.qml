@@ -11,9 +11,9 @@ Scope {
 
             required property var modelData
 
-            function truncate(str) {
-                if (str.length > 37) {
-                    return str.slice(0, 36) + "…";
+            function truncate(str, n) {
+                if (str.length > n) {
+                    return str.slice(0, n - 1) + "…";
                 }
                 return str;
             }
@@ -49,6 +49,7 @@ Scope {
                     label: Time.time
                     labelColor: Theme.clck
                 }
+
                 Rectangle {
                     implicitHeight: inner.implicitHeight
                     implicitWidth: inner.implicitWidth
@@ -58,14 +59,14 @@ Scope {
                     radius: Theme.radius
                     Row {
                         id: inner
-                        spacing: -4
+                        spacing: -10
                         Module {
                             label: "<b>" + (CompositorIpc.state.workspaces.indexOf(CompositorIpc.state.workspace_id) + 1) + "</b>"
                             labelColor: Theme.wksp
-                            drawBox: false
+                            drawBox: true
                         }
                         Module {
-                            label: root.truncate(CompositorIpc.state.window_name)
+                            label: root.truncate(CompositorIpc.state.window_name, 37)
                             labelColor: Theme.name
                             color: Theme.bgnd
                             drawBox: true
@@ -95,19 +96,10 @@ Scope {
                     labelColor: Theme.wifi
                     command: ["zsh", "-c", "~/.config/quickshell/scripts/qs-online"]
                     label: "󰖟 offline"
+
                     onclick: ["ghostty", "-e", "nmtui"]
                     interval: 1000
-                }
-                Module {
-                    label: "󰖟 " + (Network.active ? Network.active.ssid : "---")
-                    labelColor: Theme.wifi
-                    MouseArea {
-                        onClicked: function () {
-                            if (Network.active) {
-                                log(Network.active.ssid);
-                            }
-                        }
-                    }
+                    template: "%s<b> " + root.truncate(Network.active ? Network.active.ssid : "---", 15) + "</b>"
                 }
 
                 CommandMonitor {
@@ -124,8 +116,5 @@ Scope {
                 }
             }
         }
-    }
-    Component.onCompleted: {
-        Network.activeInterface;
     }
 }
