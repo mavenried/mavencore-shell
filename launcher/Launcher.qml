@@ -158,7 +158,7 @@ Scope {
                             }
                         }
                         model: root.filtered
-                        currentIndex: 0
+                        currentIndex: this.count - 1
 
                         delegate: Rectangle {
                             id: item

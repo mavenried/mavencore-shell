@@ -114,7 +114,7 @@ Scope {
             color: "transparent"
 
             anchors {
-                right: true
+                left: true
                 top: true
                 bottom: true
             }
@@ -136,7 +136,7 @@ Scope {
                 }
 
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
+                anchors.right: parent.right
                 // width: 250
                 width: 75
                 height: icon.height + rect.height + 60
