@@ -189,7 +189,8 @@ Scope {
                                     leftPadding: 10
                                     text: item.modelData.name
                                     font.pixelSize: 20
-                                    font.family: "JetbrainsMono Nerd Font"
+                                    // font.family: "JetbrainsMono Nerd Font"
+                                    font.family: "DepartureMono Nerd Font"
                                     color: item.ListView.isCurrentItem ? Theme.txt1 : Theme.txt1
                                 }
                             }
@@ -207,7 +208,8 @@ Scope {
                             placeholderText: "Search? Run? Calculate? What is it now?"
                             placeholderTextColor: Theme.txt2
                             font.pixelSize: 20
-                            font.family: "JetbrainsMono Nerd Font"
+                            // font.family: "JetbrainsMono Nerd Font"
+                            font.family: "DepartureMono Nerd Font"
                             color: Theme.txt1
                             background: Rectangle {
                                 color: Qt.rgba(0, 0, 0, 0.5)
