@@ -66,7 +66,7 @@ Scope {
                             drawBox: false
                         }
                         Module {
-                            label: root.truncate(CompositorIpc.state.window_name, 37)
+                            label: root.truncate(CompositorIpc.state.window_name, 32)
                             labelColor: Theme.name
                             color: Theme.bgnd
                             drawBox: true
