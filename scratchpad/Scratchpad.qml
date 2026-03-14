@@ -99,8 +99,7 @@ Scope {
                         text: fv.text()
 
                         font.pixelSize: 20
-                        // font.family: "JetbrainsMono Nerd Font"
-                        font.family: "DepartureMono Nerd Font"
+                        font.family: Theme.font
                         color: Theme.txt1
                         background: Rectangle {
                             anchors.fill: parent
