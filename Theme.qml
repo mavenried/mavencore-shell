@@ -1,6 +1,6 @@
+pragma Singleton
 import QtQuick
 import Quickshell
-pragma Singleton
 
 Singleton {
     readonly property color bgnd: "#141414"
@@ -26,5 +26,8 @@ Singleton {
     readonly property color bat4: "#f7ca88"
     readonly property color bat5: "#ab4642"
     readonly property color acct: "#141414"
+
     readonly property int radius: 15
+    // readonly property string font: "JetbrainsMonoNL Nerd Font"
+    readonly property string font: "DepartureMono Nerd Font"
 }

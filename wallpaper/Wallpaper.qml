@@ -45,7 +45,7 @@ Scope {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Qt.formatDateTime(clock.date, "<b>hh:mm</b>")
                         // font.family: "JetbrainsMono Nerd Font"
-                        font.family: "DepartureMono Nerd Font"
+                        font.family: Theme.font
                         color: Theme.mmry
                         font.pointSize: 20
                         horizontalAlignment: center
@@ -55,7 +55,7 @@ Scope {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Qt.formatDateTime(clock.date, "dd|MM|yy")
                         // font.family: "JetbrainsMono Nerd Font"
-                        font.family: "DepartureMono Nerd Font"
+                        font.family: Theme.font
                         color: Theme.mmry
                         font.pointSize: 10
                     }

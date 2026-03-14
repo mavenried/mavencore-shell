@@ -131,7 +131,7 @@ Scope {
                                     width: 250
                                     wrapMode: Text.Wrap
                                     font.pixelSize: 16
-                                    font.family: "JetbrainsMono Nerd Font"
+                                    font.family: Theme.font
                                 }
 
                                 Text {
@@ -140,7 +140,7 @@ Scope {
                                     width: 250
                                     wrapMode: Text.Wrap
                                     font.pixelSize: 14
-                                    font.family: "JetbrainsMono Nerd Font"
+                                    font.family: Theme.font
                                 }
                             }
                         }
