@@ -94,7 +94,7 @@ Item {
             return;
         context.cancelFingerprint();
         context.submitPassword(pw);
-        passwordField.text = "";
+    // passwordField.text = "";
     }
 
     Timer {
@@ -139,10 +139,10 @@ Item {
         }
         Text {
             x: -500 - implicitWidth / 2
-            y: -170 - implicitHeight / 2
+            y: -150 - implicitHeight / 2
             text: root.currentHour
             font {
-                pointSize: 280
+                pointSize: 250
                 family: "JetBrains Mono Nerd Font"
             }
             renderType: Text.CurveRendering
@@ -151,10 +151,10 @@ Item {
 
         Text {
             x: -500 - implicitWidth / 2
-            y: 170 - implicitHeight / 2
+            y: 150 - implicitHeight / 2
             text: root.currentMinute
             font {
-                pointSize: 280
+                pointSize: 250
                 family: "JetBrains Mono Nerd Font"
             }
             renderType: Text.CurveRendering
@@ -324,36 +324,15 @@ Item {
                                     width: 10
                                     height: 10
 
-                                    transform: Translate {
-                                        id: dotSlide
-                                        x: 12
-                                    }
-
-                                    Component.onCompleted: {
-                                        slideIn.start();
-                                        fadeIn.start();
-                                    }
-
-                                    NumberAnimation {
-                                        id: slideIn
-                                        target: dotSlide
-                                        property: "x"
-                                        from: 12
-                                        to: 0
-                                        duration: 300
-                                        easing.type: Easing.OutCubic
-                                    }
-
                                     Rectangle {
                                         anchors.centerIn: parent
                                         width: 10
                                         height: 10
                                         radius: 5
-                                        color: "#eeeeee"
+                                        color: root.pwFailed ? "#cc241d" : "#eeeeee"
                                         Behavior on color {
                                             ColorAnimation {
-                                                to: "#11eedd"
-                                                duration: 1000
+                                                duration: 300
                                             }
                                         }
                                     }
