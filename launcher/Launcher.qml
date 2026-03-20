@@ -10,6 +10,33 @@ import qs
 
 Scope {
     id: root
+
+    function fuzzyScore(name, query) {
+        name = name.toLowerCase();
+        query = query.toLowerCase();
+
+        let score = 0;
+        let j = 0;
+
+        for (let i = 0; i < name.length && j < query.length; i++) {
+            if (name[i] === query[j]) {
+                score += 2;   // match bonus
+                j++;
+            } else {
+                score -= 0.5; // gap penalty
+            }
+        }
+
+        if (j !== query.length)
+            return -Infinity;
+
+        // bonus for prefix match
+        if (name.startsWith(query))
+            score += 5;
+
+        return score;
+    }
+
     property bool open: false
     property bool cmdMode: false
     property bool clcMode: false
@@ -17,17 +44,38 @@ Scope {
 
     property var apps: []
     property var searchText: ""
+    // property var filtered: {
+    //     if (searchText.trim() === "" || root.cmdMode)
+    //         return [];
+    //     if (root.clcMode)
+    //         return [
+    //             {
+    //                 name: root.clcResult,
+    //                 icon: ""
+    //             }
+    //         ];
+    //     return root.apps.filter(a => a.name.toLowerCase().trim().includes(searchText.toLowerCase().trim()));
+    // }
     property var filtered: {
         if (searchText.trim() === "" || root.cmdMode)
             return [];
-        if (root.clcMode)
+
+        if (root.clcMode) {
             return [
                 {
                     name: root.clcResult,
                     icon: ""
                 }
             ];
-        return root.apps.filter(a => a.name.toLowerCase().trim().includes(searchText.toLowerCase().trim()));
+        }
+
+        let q = searchText.trim().toLowerCase();
+
+        return root.apps.map(a => ({
+                    app: a,
+                    score: fuzzyScore(a.name, q)
+                })).filter(x => x.score > -Infinity).sort((a, b) => b.score - a.score).slice(0, 20) // limit results
+        .map(x => x.app);
     }
 
     Process {
@@ -157,7 +205,7 @@ Scope {
                                 easing.type: Easing.InOutQuad
                             }
                         }
-                        model: root.filtered
+                        model: root.filtered.reverse()
                         currentIndex: this.count - 1
 
                         delegate: Rectangle {
@@ -184,14 +232,44 @@ Scope {
                                     height: name.implicitHeight
                                     width: name.implicitHeight
                                 }
+                                // Text {
+                                //     id: name
+                                //     leftPadding: 10
+                                //     text: item.modelData.name
+                                //     font.pixelSize: 20
+                                //     // font.family: "JetbrainsMono Nerd Font"
+                                //     font.family: Theme.font
+                                //     color: item.ListView.isCurrentItem ? Theme.txt1 : Theme.txt1
+                                // }
                                 Text {
                                     id: name
                                     leftPadding: 10
-                                    text: item.modelData.name
                                     font.pixelSize: 20
-                                    // font.family: "JetbrainsMono Nerd Font"
                                     font.family: Theme.font
-                                    color: item.ListView.isCurrentItem ? Theme.txt1 : Theme.txt1
+                                    color: Theme.txt1
+
+                                    text: {
+                                        let q = root.searchText.toLowerCase();
+                                        let n = item.modelData.name;
+
+                                        if (!q)
+                                            return n;
+
+                                        let res = "";
+                                        let qi = 0;
+
+                                        for (let i = 0; i < n.length; i++) {
+                                            if (qi < q.length && n[i].toLowerCase() === q[qi]) {
+                                                res += "<b>" + n[i] + "</b>";
+                                                qi++;
+                                            } else {
+                                                res += n[i];
+                                            }
+                                        }
+                                        return res;
+                                    }
+
+                                    textFormat: Text.RichText
                                 }
                             }
                         }
