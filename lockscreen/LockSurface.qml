@@ -3,6 +3,7 @@ import Quickshell.Io
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Effects
+import qs
 
 Item {
     id: root
@@ -105,7 +106,7 @@ Item {
 
     Timer {
         id: clearTimer
-        interval: 1200
+        interval: 1000
         onTriggered: {
             root.pwFailed = false;
             root.failText = "";
@@ -133,8 +134,8 @@ Item {
             width: 600
             height: 800
             radius: 90
-            color: "#cc141414"
-            border.color: "#141414"
+            color: Theme.bgnd
+            border.color: Theme.acct
             border.width: 2
         }
         Text {
@@ -146,7 +147,7 @@ Item {
                 family: "JetBrains Mono Nerd Font"
             }
             renderType: Text.CurveRendering
-            color: "#59cd90"
+            color: Theme.mmry
         }
 
         Text {
@@ -158,7 +159,7 @@ Item {
                 family: "JetBrains Mono Nerd Font"
             }
             renderType: Text.CurveRendering
-            color: "#ba8baf"
+            color: Theme.cpuc
         }
 
         Rectangle {
@@ -167,8 +168,8 @@ Item {
             width: 400
             height: 600
             radius: 90
-            color: "#cc141414"
-            border.color: "#141414"
+            color: Theme.bgnd
+            border.color: Theme.acct
             border.width: 2
         }
 
@@ -179,7 +180,7 @@ Item {
             height: 160
             radius: 80
             color: "transparent"
-            border.color: "#141414"
+            border.color: Theme.bgnd
             border.width: 2
             Image {
                 anchors.fill: parent
@@ -195,7 +196,7 @@ Item {
                 pointSize: 25
                 family: "JetBrains Mono Nerd Font"
             }
-            color: "#a1b56c"
+            color: Theme.uptm
         }
 
         Text {
@@ -206,7 +207,7 @@ Item {
                 pointSize: 30
                 family: "JetBrains Mono Nerd Font"
             }
-            color: "#cdd6f4"
+            color: Theme.txt1
         }
 
         Item {
@@ -257,7 +258,7 @@ Item {
                 radius: 25
                 color: "transparent"
                 border.width: 2
-                border.color: root.pwFailed ? "#cc241d" : "#141414"
+                border.color: root.pwFailed ? "#cc241d" : Theme.acct
                 Behavior on border.color {
                     ColorAnimation {
                         duration: 300
@@ -269,7 +270,7 @@ Item {
                         fill: parent
                         margins: 2
                     }
-                    color: "#000000"
+                    color: "#99000000"
                     radius: 25
 
                     TextInput {
@@ -286,7 +287,7 @@ Item {
                             pointSize: 14
                             family: "JetBrainsMonoNL Nerd Font"
                         }
-                        color: root.pwFailed ? "#cc241d" : "#eeeeee"
+                        color: root.pwFailed ? "#cc241d" : Theme.txt1
                         verticalAlignment: TextInput.AlignVCenter
                         horizontalAlignment: TextInput.AlignHCenter
                         focus: true
@@ -301,7 +302,7 @@ Item {
                             anchors.centerIn: parent
                             text: "Enter Passwd"
                             font: passwordField.font
-                            color: "#555555"
+                            color: Theme.txt2
                             visible: passwordField.text.length === 0
                         }
 
@@ -329,7 +330,7 @@ Item {
                                         width: 10
                                         height: 10
                                         radius: 5
-                                        color: root.pwFailed ? "#cc241d" : "#eeeeee"
+                                        color: root.pwFailed ? "#cc241d" : Theme.txt1
                                         Behavior on color {
                                             ColorAnimation {
                                                 duration: 300
@@ -373,8 +374,8 @@ Item {
         width: 85
         height: 35
         radius: 15
-        color: "#cc141414"
-        border.color: "#141414"
+        color: Theme.bgnd
+        border.color: Theme.acct
         border.width: 2
 
         Text {
@@ -384,7 +385,7 @@ Item {
                 pointSize: 12
                 family: "JetBrains Mono Nerd Font"
             }
-            color: "#7cafc2"
+            color: Theme.disk
         }
     }
 }

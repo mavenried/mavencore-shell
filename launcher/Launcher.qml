@@ -260,7 +260,7 @@ Scope {
 
                                         for (let i = 0; i < n.length; i++) {
                                             if (qi < q.length && n[i].toLowerCase() === q[qi]) {
-                                                res += "<b>" + n[i] + "</b>";
+                                                res += "<b><u>" + n[i] + "</u></b>";
                                                 qi++;
                                             } else {
                                                 res += n[i];
