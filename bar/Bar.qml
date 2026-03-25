@@ -82,7 +82,9 @@ Scope {
                 spacing: 5
                 bottomPadding: 0
 
-                SysInfo {}
+                SysInfo {
+                    bpath: "/sys/class/power_supply/BAT1"
+                }
             }
 
             Row {

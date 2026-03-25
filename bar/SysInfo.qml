@@ -4,12 +4,13 @@ import qs
 
 Rectangle {
     id: root
+    property string bpath
 
     property string cpu: " ---%"
     property string ram: " ---%"
     property string dsk: "󰋊 ---%"
     property string bat: "󰁾 ---%"
-    property string bat_icon;
+    property string bat_icon
     property string pow: "󱐋 --W"
 
     function getBatteryColor() {
@@ -69,7 +70,7 @@ Rectangle {
             labelColor: root.getBatteryColor()
             drawBox: false
             template: root.bat_icon + " %3s%"
-            command: ["mavencore", "battery", "/sys/class/power_supply/BAT1"]
+            command: ["mavencore", "battery", root.bpath]
         }
 
         CommandMonitor {
@@ -77,9 +78,8 @@ Rectangle {
             labelColor: Theme.powr
             drawBox: false
             template: "󱐋 %2sW"
-            command: ["mavencore", "power", "/sys/class/power_supply/BAT1"]
+            command: ["mavencore", "power", root.bpath]
         }
-
     }
 
     // Connections {
@@ -91,12 +91,11 @@ Rectangle {
         id: updater
 
         running: true
-        command: ["mavencore", "battery-icon", "/sys/class/power_supply/BAT1"]
+        command: ["mavencore", "battery-icon", root.bpath]
 
         stdout: StdioCollector {
             onStreamFinished: root.bat_icon = this.text.trim()
         }
-
     }
 
     Timer {
@@ -105,5 +104,4 @@ Rectangle {
         repeat: true
         onTriggered: updater.running = true
     }
-
 }
