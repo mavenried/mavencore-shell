@@ -43,6 +43,10 @@ Item {
             onRead: data => root.uptimeText = " " + data.trim()
         }
     }
+    // process {
+    //     id: getUsername
+    //     command:
+    // }
 
     Timer {
         interval: 5000
@@ -95,7 +99,7 @@ Item {
             return;
         context.cancelFingerprint();
         context.submitPassword(pw);
-    // passwordField.text = "";
+        // passwordField.text = "";
     }
 
     Timer {
@@ -202,7 +206,7 @@ Item {
         Text {
             x: 500 - implicitWidth / 2
             y: 100 - implicitHeight / 2
-            text: "mavenried"
+            text: Quickshell.env("USER")
             font {
                 pointSize: 30
                 family: "JetBrains Mono Nerd Font"
