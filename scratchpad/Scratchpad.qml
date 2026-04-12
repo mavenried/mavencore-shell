@@ -17,14 +17,12 @@ Scope {
     IpcHandler {
         id: handler
         target: "scratchpad"
-        function open() {
+        function toggle() {
             loader.active = true;
-            root.open = true;
-        }
-
-        function close() {
-            root.open = false;
-            closeTimer.start();
+            root.open = !root.open;
+            if (!root.open) {
+                closeTimer.start();
+            }
         }
     }
     Timer {
@@ -85,7 +83,7 @@ Scope {
                     if (event.key === Qt.Key_Escape) {
                         console.log("Escape pressed!");
                         fv.setText(text.text);
-                        handler.close();
+                        handler.toggle();
                     }
                 }
 

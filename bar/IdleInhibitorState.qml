@@ -1,6 +1,7 @@
 pragma Singleton
 import Quickshell
 import Quickshell.Io
+import QtQuick
 
 Singleton {
     property bool active: false
@@ -17,5 +18,9 @@ Singleton {
 
         running: false
         command: ["systemd-inhibit", "--what=sleep:idle", "--why=MavenCore Sleep Inhibit", "--mode=block", "sleep", "infinity"]
+    }
+
+    Component.onDestruction: {
+        proc.running = false;
     }
 }

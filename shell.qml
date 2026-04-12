@@ -18,5 +18,5 @@ ShellRoot {
     Notifyd {}
     Launcher {}
     Osd {}
-    LockScreen{}
+    LockScreen {}
 }
