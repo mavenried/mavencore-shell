@@ -2,7 +2,6 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
 import QtQuick
-import QtQuick.Effects
 import qs
 
 Item {
@@ -276,6 +275,12 @@ Item {
                     }
                     color: "#99000000"
                     radius: 25
+
+                    Keys.onPressed: function (event) {
+                        if (event.key === Qt.Key_Escape) {
+                            passwordField.clear();
+                        }
+                    }
 
                     TextInput {
                         id: passwordField

@@ -21,6 +21,7 @@ Scope {
             loader.active = true;
             root.open = !root.open;
             if (!root.open) {
+                fv.setText(text.text);
                 closeTimer.start();
             }
         }
@@ -82,7 +83,6 @@ Scope {
                     console.log("Key pressed:", event.key);
                     if (event.key === Qt.Key_Escape) {
                         console.log("Escape pressed!");
-                        fv.setText(text.text);
                         handler.toggle();
                     }
                 }
