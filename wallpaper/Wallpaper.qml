@@ -5,6 +5,8 @@ import Quickshell.Io
 import qs
 
 Scope {
+    id: scope
+    property string wallpaperPath
     Variants {
         model: Quickshell.screens
 
@@ -27,8 +29,8 @@ Scope {
 
             Image {
                 id: img
-                anchors.fill: parent
-                source: "/mnt/DATA/Pictures/CURRENT"
+                anchors.centerIn: parent
+                source: scope.wallpaperPath
             }
 
             Rectangle {
@@ -90,7 +92,8 @@ Scope {
                 function reload() {
                     img.source = "";
                     img.opacity = 0;
-                    img.source = "/mnt/DATA/Pictures/CURRENT";
+                    img.source = scope.wallpaperPath;
+
                     fadeIn.start();
 
                     rect.opacity = 0;
@@ -99,7 +102,7 @@ Scope {
             }
             FileView {
                 id: fv
-                path: Qt.resolvedUrl("/mnt/DATA/Pictures/CURRENT")
+                path: Qt.resolvedUrl(scope.wallpaperPath)
                 watchChanges: true
                 onFileChanged: ipc.reload()
             }

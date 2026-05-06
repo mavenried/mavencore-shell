@@ -10,7 +10,9 @@ import qs.lockscreen
 
 ShellRoot {
 
-    Wallpaper {}
+    Wallpaper {
+        wallpaperPath: "/mnt/DATA/Pictures/CURRENT"
+    }
     Scratchpad {
         path: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
     }
