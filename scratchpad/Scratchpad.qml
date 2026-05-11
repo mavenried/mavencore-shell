@@ -11,7 +11,7 @@ import qs
 Scope {
     id: root
 
-    property string path: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad" // pass in your path from shell.qml only. do not edit here :)
+    required property string savePath
     property bool open: false
 
     IpcHandler {

@@ -6,7 +6,8 @@ import qs
 
 Scope {
     id: scope
-    property string wallpaperPath
+    required property string wallpaperPath
+    property bool showTime: false
     Variants {
         model: Quickshell.screens
 
@@ -29,12 +30,15 @@ Scope {
 
             Image {
                 id: img
-                anchors.centerIn: parent
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectCrop
                 source: scope.wallpaperPath
+                clip: true
             }
 
             Rectangle {
                 id: rect
+                visible: scope.showTime
                 x: 1920 / 2 - inner.width / 2
                 y: 780
                 width: inner.width

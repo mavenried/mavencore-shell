@@ -4,7 +4,10 @@ import qs
 
 Rectangle {
     id: root
-    property string bpath
+    property bool showBattery: true
+    property bool showPower: true
+    property string batteryPath: "/sys/class/power_supply/BAT1"
+    property string diskPath: "/"
 
     property string cpu: " ---%"
     property string ram: " ---%"
@@ -60,25 +63,27 @@ Rectangle {
             labelColor: Theme.disk
             drawBox: false
             template: "󰋊 %3s%"
-            command: ["mavencore", "disk", "/mnt/DATA/"]
+            command: ["mavencore", "disk", root.diskPath]
         }
 
         CommandMonitor {
             id: battery
+            visible: root.showBattery
 
             label: root.bat
             labelColor: root.getBatteryColor()
             drawBox: false
             template: root.bat_icon + " %3s%"
-            command: ["mavencore", "battery", root.bpath]
+            command: ["mavencore", "battery", root.batteryPath]
         }
 
         CommandMonitor {
+            visible: root.showBattery && root.showPower
             label: root.pow
             labelColor: Theme.powr
             drawBox: false
             template: "󱐋 %2sW"
-            command: ["mavencore", "power", root.bpath]
+            command: ["mavencore", "power", root.batteryPath]
         }
     }
 
@@ -91,7 +96,7 @@ Rectangle {
         id: updater
 
         running: true
-        command: ["mavencore", "battery-icon", root.bpath]
+        command: ["mavencore", "battery-icon", root.batteryPath]
 
         stdout: StdioCollector {
             onStreamFinished: root.bat_icon = this.text.trim()

@@ -3,6 +3,11 @@ import Quickshell
 import qs
 
 Scope {
+    id: scope
+    property string batteryPath
+    required property string diskPath
+    property bool showBattery: true
+    property bool showPower: true
     Variants {
         model: Quickshell.screens
 
@@ -83,7 +88,10 @@ Scope {
                 bottomPadding: 0
 
                 SysInfo {
-                    bpath: "/sys/class/power_supply/BAT1"
+                    batteryPath: scope.batteryPath
+                    diskPath: scope.diskPath
+                    showBattery: scope.showBattery
+                    showPower: scope.showPower
                 }
             }
 

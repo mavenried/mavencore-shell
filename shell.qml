@@ -12,11 +12,17 @@ ShellRoot {
 
     Wallpaper {
         wallpaperPath: "/mnt/DATA/Pictures/CURRENT"
+        showTime: true
     }
     Scratchpad {
-        path: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
+        savePath: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
     }
-    Bar {}
+    Bar {
+        batteryPath: "/sys/class/power_supply/BAT1"
+        showBattery: true
+        showPower: true
+        diskPath: "/mnt/DATA"
+    }
     Notifyd {}
     Launcher {}
     Osd {}
