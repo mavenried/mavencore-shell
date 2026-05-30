@@ -35,7 +35,7 @@ Scope {
     }
     FileView {
         id: fv
-        path: Qt.resolvedUrl(root.path)
+        path: Qt.resolvedUrl(root.savePath)
         onFileChanged: text.text = fv.text()
         onLoaded: {
             console.log(fv.text());

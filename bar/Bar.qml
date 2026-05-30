@@ -107,7 +107,7 @@ Scope {
                     command: ["zsh", "-c", "~/.config/quickshell/scripts/qs-online"]
                     label: "󰖟 offline"
 
-                    onclick: ["ghostty", "-e", "nmtui"]
+                    onclick: ["qs", "ipc", "call", "network-manager", "toggle"]
                     interval: 1000
                     template: "%s<b> " + root.truncate(Network.active ? Network.active.ssid : "---", 15) + "</b>"
                 }

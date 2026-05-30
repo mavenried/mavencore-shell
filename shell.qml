@@ -17,6 +17,7 @@ ShellRoot {
     Scratchpad {
         savePath: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
     }
+    NetworkManager {}
     Bar {
         batteryPath: "/sys/class/power_supply/BAT1"
         showBattery: true
