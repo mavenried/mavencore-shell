@@ -12,11 +12,15 @@ Singleton {
     property string icon: String.fromCodePoint(0xF007E)
 
     readonly property color levelColor: {
-        if (level <= 10) return Theme.bat5
-        if (level <= 25) return Theme.bat4
-        if (level <= 50) return Theme.bat3
-        if (level <= 75) return Theme.bat2
-        return Theme.bat1
+        if (level <= 10)
+            return Theme.bat5;
+        if (level <= 25)
+            return Theme.bat4;
+        if (level <= 50)
+            return Theme.bat3;
+        if (level <= 75)
+            return Theme.bat2;
+        return Theme.bat1;
     }
 
     Process {
@@ -49,9 +53,12 @@ Singleton {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            levelProc.running = false; levelProc.running = true
-            powerProc.running = false; powerProc.running = true
-            iconProc.running = false; iconProc.running = true
+            levelProc.running = false;
+            levelProc.running = true;
+            powerProc.running = false;
+            powerProc.running = true;
+            iconProc.running = false;
+            iconProc.running = true;
         }
     }
 }

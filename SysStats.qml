@@ -30,8 +30,10 @@ Singleton {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            cpuProc.running = false; cpuProc.running = true
-            ramProc.running = false; ramProc.running = true
+            cpuProc.running = false;
+            cpuProc.running = true;
+            ramProc.running = false;
+            ramProc.running = true;
         }
     }
 }

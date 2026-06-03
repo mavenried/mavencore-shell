@@ -11,13 +11,16 @@ Item {
     required property string statusMessage
 
     signal connectRequested(string ssid, string bssid, bool secure)
-    signal disconnectRequested()
+    signal disconnectRequested
 
     implicitHeight: col.implicitHeight
 
     ColumnLayout {
         id: col
-        anchors { left: parent.left; right: parent.right }
+        anchors {
+            left: parent.left
+            right: parent.right
+        }
         spacing: 12
 
         // ── Header ───────────────────────────────────────────────────
@@ -31,7 +34,9 @@ Item {
                 font.bold: true
                 color: Theme.mmry
             }
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             Rectangle {
                 width: wifiToggleLbl.width + 24
@@ -40,19 +45,24 @@ Item {
                 color: Network.wifiEnabled ? Theme.mmry : Theme.sptr
                 border.color: Theme.acct
                 border.width: 2
-                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 150
+                    }
+                }
 
                 Text {
                     id: wifiToggleLbl
                     anchors.centerIn: parent
-                    text: Network.wifiEnabled
-                        ? String.fromCodePoint(0xF05A9) + "  Wi-Fi ON"
-                        : String.fromCodePoint(0xF05AA) + "  Wi-Fi OFF"
+                    text: Network.wifiEnabled ? String.fromCodePoint(0xF05A9) + "  Wi-Fi ON" : String.fromCodePoint(0xF05AA) + "  Wi-Fi OFF"
                     font.pixelSize: 13
                     font.family: Theme.font
                     color: Theme.bgnd
                 }
-                MouseArea { anchors.fill: parent; onClicked: Network.toggleWifi(cb => {}) }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: Network.toggleWifi(cb => {})
+                }
             }
 
             Rectangle {
@@ -66,14 +76,16 @@ Item {
                 Text {
                     id: scanLbl
                     anchors.centerIn: parent
-                    text: Network.scanning
-                        ? String.fromCodePoint(0xF0450) + "  scanning" + String.fromCodePoint(0x2026)
-                        : String.fromCodePoint(0xF0450) + "  scan"
+                    text: Network.scanning ? String.fromCodePoint(0xF0450) + "  scanning" + String.fromCodePoint(0x2026) : String.fromCodePoint(0xF0450) + "  scan"
                     font.pixelSize: 13
                     font.family: Theme.font
                     color: Network.scanning ? Theme.mmry : Theme.txt2
                 }
-                MouseArea { anchors.fill: parent; enabled: !Network.scanning; onClicked: Network.rescanWifi() }
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: !Network.scanning
+                    onClicked: Network.rescanWifi()
+                }
             }
         }
 
@@ -113,24 +125,33 @@ Item {
                     color: "transparent"
                     border.color: modelData.active ? Theme.mmry : "transparent"
                     border.width: 1
-                    Behavior on color { ColorAnimation { duration: 100 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 100
+                        }
+                    }
 
                     RowLayout {
                         id: netRow
                         anchors {
-                            left: parent.left; right: parent.right
+                            left: parent.left
+                            right: parent.right
                             verticalCenter: parent.verticalCenter
-                            leftMargin: 12; rightMargin: 12
+                            leftMargin: 12
+                            rightMargin: 12
                         }
                         spacing: 8
 
                         Text {
                             text: {
-                                const s = netItem.modelData.strength
-                                if (s >= 75) return String.fromCodePoint(0xF0928)
-                                if (s >= 50) return String.fromCodePoint(0xF0925)
-                                if (s >= 25) return String.fromCodePoint(0xF0922)
-                                return String.fromCodePoint(0xF091F)
+                                const s = netItem.modelData.strength;
+                                if (s >= 75)
+                                    return String.fromCodePoint(0xF0928);
+                                if (s >= 50)
+                                    return String.fromCodePoint(0xF0925);
+                                if (s >= 25)
+                                    return String.fromCodePoint(0xF0922);
+                                return String.fromCodePoint(0xF091F);
                             }
                             font.pixelSize: 16
                             font.family: Theme.font
@@ -176,20 +197,19 @@ Item {
                             width: 90
                             height: btnLbl.height + 8
                             radius: Theme.radius
-                            color: netItem.modelData.active ? Theme.bat5
-                                : root.connecting && root.pendingSsid === netItem.modelData.ssid ? Theme.sptr
-                                : Theme.bgnd
+                            color: netItem.modelData.active ? Theme.bat5 : root.connecting && root.pendingSsid === netItem.modelData.ssid ? Theme.sptr : Theme.bgnd
                             border.color: netItem.modelData.active ? Theme.bat5 : Theme.acct
                             border.width: 1
-                            Behavior on color { ColorAnimation { duration: 100 } }
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: 100
+                                }
+                            }
 
                             Text {
                                 id: btnLbl
                                 anchors.centerIn: parent
-                                text: netItem.modelData.active ? "disconnect"
-                                    : root.connecting && root.pendingSsid === netItem.modelData.ssid
-                                        ? "connecting" + String.fromCodePoint(0x2026)
-                                    : "connect"
+                                text: netItem.modelData.active ? "disconnect" : root.connecting && root.pendingSsid === netItem.modelData.ssid ? "connecting" + String.fromCodePoint(0x2026) : "connect"
                                 font.pixelSize: 12
                                 font.family: Theme.font
                                 color: netItem.modelData.active ? Theme.txt1 : Theme.txt2
@@ -200,16 +220,10 @@ Item {
                                 enabled: !root.connecting
                                 onClicked: {
                                     if (netItem.modelData.active) {
-                                        root.disconnectRequested()
+                                        root.disconnectRequested();
                                     } else {
-                                        const secure = netItem.modelData.security
-                                            && netItem.modelData.security !== "--"
-                                            && netItem.modelData.security.length > 0
-                                        root.connectRequested(
-                                            netItem.modelData.ssid,
-                                            netItem.modelData.bssid || "",
-                                            secure
-                                        )
+                                        const secure = netItem.modelData.security && netItem.modelData.security !== "--" && netItem.modelData.security.length > 0;
+                                        root.connectRequested(netItem.modelData.ssid, netItem.modelData.bssid || "", secure);
                                     }
                                 }
                             }

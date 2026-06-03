@@ -117,17 +117,17 @@ Scope {
         id: handler
         target: "launcher"
         function open() {
-            ot.setOpen(true)
-            proc.running = true
-            root.apps = []
+            ot.setOpen(true);
+            proc.running = true;
+            root.apps = [];
         }
 
         function close() {
-            ot.setOpen(false)
-            root.apps = []
-            root.searchText = ""
-            root.cmdMode = false
-            root.clcMode = false
+            ot.setOpen(false);
+            root.apps = [];
+            root.searchText = "";
+            root.cmdMode = false;
+            root.clcMode = false;
         }
     }
     LazyLoader {

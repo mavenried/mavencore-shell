@@ -25,16 +25,13 @@ Item {
         onRunningChanged: {
             if (!running)
                 running = true;
-
         }
         Component.onCompleted: running = true
 
         stdout: SplitParser {
-            onRead: function(data) {
+            onRead: function (data) {
                 root.focusName = data;
             }
         }
-
     }
-
 }

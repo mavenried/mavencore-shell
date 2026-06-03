@@ -5,6 +5,7 @@ import Quickshell.Io
 import QtQuick
 
 Scope {
+    id: lockScreen
     property string blurPath: ""
 
     LockContext {
@@ -30,7 +31,7 @@ Scope {
             LockSurface {
                 anchors.fill: parent
                 context: lockContext
-                blurPath: blurPath
+                blurPath: lockScreen.blurPath
             }
         }
     }

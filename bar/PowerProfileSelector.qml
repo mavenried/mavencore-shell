@@ -39,5 +39,4 @@ Item {
         anchors.fill: parent
         onClicked: root.setNextMode()
     }
-
 }

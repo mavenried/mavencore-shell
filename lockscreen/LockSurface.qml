@@ -28,7 +28,6 @@ Item {
         }
     }
 
-
     Timer {
         interval: 5000
         running: true

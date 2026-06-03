@@ -24,6 +24,9 @@ Item {
         running: true
         repeat: true
         triggeredOnStart: true
-        onTriggered: { proc.running = false; proc.running = true }
+        onTriggered: {
+            proc.running = false;
+            proc.running = true;
+        }
     }
 }

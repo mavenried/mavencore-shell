@@ -9,7 +9,7 @@ Item {
 
     property string ssid: ""
     signal passwordAccepted(string password)
-    signal dismissed()
+    signal dismissed
 
     // Dark scrim behind the form
     Rectangle {
@@ -17,7 +17,9 @@ Item {
         color: Qt.rgba(0, 0, 0, 0.55)
         radius: Theme.radius
 
-        MouseArea { anchors.fill: parent }
+        MouseArea {
+            anchors.fill: parent
+        }
 
         Rectangle {
             anchors.centerIn: parent
@@ -28,7 +30,10 @@ Item {
             border.color: Theme.mmry
             border.width: 2
 
-            Keys.onEscapePressed: function(e) { root.dismissed(); e.accepted = true }
+            Keys.onEscapePressed: function (e) {
+                root.dismissed();
+                e.accepted = true;
+            }
 
             ColumnLayout {
                 id: form
@@ -59,20 +64,28 @@ Item {
 
                     TextInput {
                         id: pwdInput
-                        anchors { fill: parent; margins: 8 }
+                        anchors {
+                            fill: parent
+                            margins: 8
+                        }
                         echoMode: TextInput.Password
                         font.pixelSize: 14
                         font.family: Theme.font
                         color: Theme.txt1
                         focus: root.visible
-                        Keys.onEscapePressed: function(e) { root.dismissed(); e.accepted = true }
+                        Keys.onEscapePressed: function (e) {
+                            root.dismissed();
+                            e.accepted = true;
+                        }
                         onAccepted: root.passwordAccepted(pwdInput.text)
                     }
                 }
 
                 RowLayout {
                     Layout.fillWidth: true
-                    Item { Layout.fillWidth: true }
+                    Item {
+                        Layout.fillWidth: true
+                    }
 
                     Rectangle {
                         width: cancelLbl.width + 20
@@ -89,7 +102,10 @@ Item {
                             font.family: Theme.font
                             color: Theme.txt2
                         }
-                        MouseArea { anchors.fill: parent; onClicked: root.dismissed() }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: root.dismissed()
+                        }
                     }
 
                     Rectangle {
@@ -105,12 +121,16 @@ Item {
                             font.family: Theme.font
                             color: Theme.bgnd
                         }
-                        MouseArea { anchors.fill: parent; onClicked: root.passwordAccepted(pwdInput.text) }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: root.passwordAccepted(pwdInput.text)
+                        }
                     }
                 }
             }
         }
     }
 
-    onVisibleChanged: if (!visible) pwdInput.text = ""
+    onVisibleChanged: if (!visible)
+        pwdInput.text = ""
 }

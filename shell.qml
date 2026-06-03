@@ -20,6 +20,7 @@ ShellRoot {
         scratchpadPath: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
         todoPath: "/mnt/DATA/Documents/scratches/.mavencore-todo"
         networkIface: "wlan0"
+        weatherLocation: "Kochi"
     }
     NetworkManager {}
     Bar {

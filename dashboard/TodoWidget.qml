@@ -32,12 +32,27 @@ WidgetCard {
         var lines = pf.read().split("\n").filter(l => l.trim());
         root.items = lines.map(function (l) {
             if (l.startsWith("# "))
-                return { type: "group", text: l.slice(2) };
+                return {
+                    type: "group",
+                    text: l.slice(2)
+                };
             if (l.startsWith("[x] "))
-                return { type: "item", done: true,  text: l.slice(4) };
+                return {
+                    type: "item",
+                    done: true,
+                    text: l.slice(4)
+                };
             if (l.startsWith("[ ] "))
-                return { type: "item", done: false, text: l.slice(4) };
-            return { type: "item", done: false, text: l };
+                return {
+                    type: "item",
+                    done: false,
+                    text: l.slice(4)
+                };
+            return {
+                type: "item",
+                done: false,
+                text: l
+            };
         });
     }
 
@@ -178,7 +193,11 @@ WidgetCard {
                     }
                     onClicked: {
                         var a = root.items.slice();
-                        a[entry.index] = { type: "item", done: !entry.modelData.done, text: entry.modelData.text };
+                        a[entry.index] = {
+                            type: "item",
+                            done: !entry.modelData.done,
+                            text: entry.modelData.text
+                        };
                         root.items = a;
                         root._serialize();
                     }
@@ -186,7 +205,9 @@ WidgetCard {
             }
         }
 
-        Item { Layout.fillHeight: true }
+        Item {
+            Layout.fillHeight: true
+        }
 
         RowLayout {
             Layout.fillWidth: true
@@ -217,7 +238,8 @@ WidgetCard {
 
                 function add() {
                     var t = inputField.text.trim();
-                    if (!t) return;
+                    if (!t)
+                        return;
                     var m = t.match(/^#(\S+)(?:\s+(.+))?$/);
                     if (m) {
                         var groupName = m[1];
@@ -233,7 +255,10 @@ WidgetCard {
                         }
 
                         if (groupIdx === -1) {
-                            a.push({ type: "group", text: groupName });
+                            a.push({
+                                type: "group",
+                                text: groupName
+                            });
                             groupIdx = a.length - 1;
                         }
 
@@ -241,13 +266,23 @@ WidgetCard {
                             var insertAt = groupIdx + 1;
                             while (insertAt < a.length && a[insertAt].type !== "group")
                                 insertAt++;
-                            a.splice(insertAt, 0, { type: "item", done: false, text: taskText });
+                            a.splice(insertAt, 0, {
+                                type: "item",
+                                done: false,
+                                text: taskText
+                            });
                         }
 
                         root.items = a;
                     } else {
                         // Ungrouped tasks go to the top
-                        root.items = [{ type: "item", done: false, text: t }].concat(root.items);
+                        root.items = [
+                            {
+                                type: "item",
+                                done: false,
+                                text: t
+                            }
+                        ].concat(root.items);
                     }
 
                     inputField.text = "";

@@ -48,8 +48,8 @@ WidgetCard {
                     selectByMouse: true
 
                     Component.onCompleted: {
-                        this.text = pf.read()
-                        cursorPosition = this.text.length
+                        this.text = pf.read();
+                        cursorPosition = this.text.length;
                     }
 
                     onTextChanged: pf.save(editor.text)

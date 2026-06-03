@@ -18,12 +18,12 @@ WidgetCard {
     }
 
     function daysInMonth(y, m) {
-        return new Date(y, m + 1, 0).getDate()
+        return new Date(y, m + 1, 0).getDate();
     }
 
     // Monday-first offset: 0=Mon … 6=Sun
     function firstWeekday(y, m) {
-        return (new Date(y, m, 1).getDay() + 6) % 7
+        return (new Date(y, m, 1).getDay() + 6) % 7;
     }
 
     ColumnLayout {
@@ -43,13 +43,18 @@ WidgetCard {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        if (root.viewMonth === 0) { root.viewMonth = 11; root.viewYear-- }
-                        else root.viewMonth--
+                        if (root.viewMonth === 0) {
+                            root.viewMonth = 11;
+                            root.viewYear--;
+                        } else
+                            root.viewMonth--;
                     }
                 }
             }
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             Text {
                 text: Qt.formatDate(new Date(root.viewYear, root.viewMonth, 1), "MMMM yyyy")
@@ -59,7 +64,9 @@ WidgetCard {
                 font.family: Theme.font
             }
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             Text {
                 text: String.fromCodePoint(0x203A)
@@ -69,8 +76,11 @@ WidgetCard {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        if (root.viewMonth === 11) { root.viewMonth = 0; root.viewYear++ }
-                        else root.viewMonth++
+                        if (root.viewMonth === 11) {
+                            root.viewMonth = 0;
+                            root.viewYear++;
+                        } else
+                            root.viewMonth++;
                     }
                 }
             }
@@ -105,10 +115,7 @@ WidgetCard {
 
                     property int day: index - root.firstWeekday(root.viewYear, root.viewMonth) + 1
                     property bool inMonth: day >= 1 && day <= root.daysInMonth(root.viewYear, root.viewMonth)
-                    property bool isToday: inMonth
-                        && day === root.today.getDate()
-                        && root.viewMonth === root.today.getMonth()
-                        && root.viewYear === root.today.getFullYear()
+                    property bool isToday: inMonth && day === root.today.getDate() && root.viewMonth === root.today.getMonth() && root.viewYear === root.today.getFullYear()
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: 24

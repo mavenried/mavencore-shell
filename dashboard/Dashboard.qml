@@ -25,24 +25,26 @@ Scope {
     property string wxIcon: String.fromCodePoint(0x1F321)
 
     function wxCodeToIcon(code) {
-        if (code === 113) return String.fromCodePoint(0x2600)   // ☀  Clear
-        if (code === 116) return String.fromCodePoint(0x26C5)   // ⛅ Partly cloudy
-        if (code === 119 || code === 122) return String.fromCodePoint(0x2601)  // ☁  Cloudy/Overcast
-        if (code === 143 || code === 248 || code === 260) return String.fromCodePoint(0x1F32B) // 🌫 Mist/Fog
-        if (code === 200 || code >= 386) return String.fromCodePoint(0x26C8)   // ⛈ Thunder
+        if (code === 113)
+            return String.fromCodePoint(0x2600);   // ☀  Clear
+        if (code === 116)
+            return String.fromCodePoint(0x26C5);   // ⛅ Partly cloudy
+        if (code === 119 || code === 122)
+            return String.fromCodePoint(0x2601);  // ☁  Cloudy/Overcast
+        if (code === 143 || code === 248 || code === 260)
+            return String.fromCodePoint(0x1F32B); // 🌫 Mist/Fog
+        if (code === 200 || code >= 386)
+            return String.fromCodePoint(0x26C8);   // ⛈ Thunder
         // Snow: patchy/blowing/blizzard, sleet, ice, snow showers
-        if (code === 179 || code === 182 || code === 227 || code === 230 ||
-            code === 317 || code === 320 ||
-            (code >= 323 && code <= 350) ||
-            (code >= 362 && code <= 377))
-            return String.fromCodePoint(0x2744)  // ❄  Snow/Sleet/Ice
+        if (code === 179 || code === 182 || code === 227 || code === 230 || code === 317 || code === 320 || (code >= 323 && code <= 350) || (code >= 362 && code <= 377))
+            return String.fromCodePoint(0x2744);  // ❄  Snow/Sleet/Ice
         // Rain: heavy showers, moderate+
         if ((code >= 299 && code <= 314) || code === 356 || code === 359)
-            return String.fromCodePoint(0x1F327) // 🌧 Rain
+            return String.fromCodePoint(0x1F327); // 🌧 Rain
         // Light rain/drizzle: patchy, freezing drizzle, light drizzle, light showers
         if (code === 176 || code === 185 || (code >= 263 && code <= 296) || code === 353)
-            return String.fromCodePoint(0x1F326) // 🌦 Light rain
-        return String.fromCodePoint(0x1F321)     // 🌡 default
+            return String.fromCodePoint(0x1F326); // 🌦 Light rain
+        return String.fromCodePoint(0x1F321);     // 🌡 default
     }
 
     Timer {
@@ -65,7 +67,7 @@ Scope {
                     var d = JSON.parse(this.text);
                     var c = d.current_condition[0];
                     var a = d.nearest_area[0];
-                    root.wxLocation = a.areaName[0].value + ", " + a.country[0].value;
+                    root.wxLocation = root.weatherLocation;
                     root.wxTemp = c.temp_C + String.fromCodePoint(0xB0) + "C";
                     root.wxFeelsLike = c.FeelsLikeC + String.fromCodePoint(0xB0) + "C";
                     root.wxCondition = c.weatherDesc[0].value;
@@ -80,48 +82,51 @@ Scope {
     }
 
     // ── Pomodoro (outside LazyLoader — timer keeps running while closed) ────
-    property int    pomWorkMins:      25
-    property int    pomBreakMins:     5
-    property int    pomLongBreakMins: 15
-    property string pomPhase:         "idle"
-    property bool   pomPaused:        false
-    property int    pomSecondsLeft:   25 * 60
-    property int    pomSessions:      0
+    property int pomWorkMins: 25
+    property int pomBreakMins: 5
+    property int pomLongBreakMins: 15
+    property string pomPhase: "idle"
+    property bool pomPaused: false
+    property int pomSecondsLeft: 25 * 60
+    property int pomSessions: 0
 
     readonly property int pomTotalSeconds: {
-        if (pomPhase === "work")      return pomWorkMins * 60
-        if (pomPhase === "longBreak") return pomLongBreakMins * 60
-        if (pomPhase !== "idle")      return pomBreakMins * 60
-        return pomWorkMins * 60
+        if (pomPhase === "work")
+            return pomWorkMins * 60;
+        if (pomPhase === "longBreak")
+            return pomLongBreakMins * 60;
+        if (pomPhase !== "idle")
+            return pomBreakMins * 60;
+        return pomWorkMins * 60;
     }
 
     function pomAdvance() {
         if (pomPhase === "work") {
-            pomSessions++
-            pomPhase       = (pomSessions % 4 === 0) ? "longBreak" : "break"
-            pomSecondsLeft = (pomPhase === "longBreak") ? pomLongBreakMins * 60 : pomBreakMins * 60
+            pomSessions++;
+            pomPhase = (pomSessions % 4 === 0) ? "longBreak" : "break";
+            pomSecondsLeft = (pomPhase === "longBreak") ? pomLongBreakMins * 60 : pomBreakMins * 60;
         } else {
-            pomPhase       = "work"
-            pomSecondsLeft = pomWorkMins * 60
+            pomPhase = "work";
+            pomSecondsLeft = pomWorkMins * 60;
         }
-        pomPaused = false
+        pomPaused = false;
     }
 
     function pomStartPause() {
         if (pomPhase === "idle") {
-            pomPhase       = "work"
-            pomSecondsLeft = pomWorkMins * 60
-            pomPaused      = false
+            pomPhase = "work";
+            pomSecondsLeft = pomWorkMins * 60;
+            pomPaused = false;
         } else {
-            pomPaused = !pomPaused
+            pomPaused = !pomPaused;
         }
     }
 
     function pomReset() {
-        pomPhase       = "idle"
-        pomPaused      = false
-        pomSecondsLeft = pomWorkMins * 60
-        pomSessions    = 0
+        pomPhase = "idle";
+        pomPaused = false;
+        pomSecondsLeft = pomWorkMins * 60;
+        pomSessions = 0;
     }
 
     Timer {
@@ -129,8 +134,10 @@ Scope {
         running: root.pomPhase !== "idle" && !root.pomPaused
         repeat: true
         onTriggered: {
-            if (root.pomSecondsLeft > 0) root.pomSecondsLeft--
-            else root.pomAdvance()
+            if (root.pomSecondsLeft > 0)
+                root.pomSecondsLeft--;
+            else
+                root.pomAdvance();
         }
     }
 
@@ -144,7 +151,9 @@ Scope {
     IpcHandler {
         id: handler
         target: "dashboard"
-        function toggle() { ot.toggle() }
+        function toggle() {
+            ot.toggle();
+        }
     }
 
     // ── UI ───────────────────────────────────────────────────────────────────
@@ -288,12 +297,12 @@ Scope {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 190
                                 weatherLocation: root.wxLocation
-                                temperature:     root.wxTemp
-                                feelsLike:       root.wxFeelsLike
-                                condition:       root.wxCondition
-                                humidity:        root.wxHumidity
-                                windSpeed:       root.wxWind
-                                icon:            root.wxIcon
+                                temperature: root.wxTemp
+                                feelsLike: root.wxFeelsLike
+                                condition: root.wxCondition
+                                humidity: root.wxHumidity
+                                windSpeed: root.wxWind
+                                icon: root.wxIcon
                             }
 
                             MediaWidget {
@@ -304,14 +313,14 @@ Scope {
                             PomodoroWidget {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                phase:        root.pomPhase
-                                paused:       root.pomPaused
-                                secondsLeft:  root.pomSecondsLeft
+                                phase: root.pomPhase
+                                paused: root.pomPaused
+                                secondsLeft: root.pomSecondsLeft
                                 totalSeconds: root.pomTotalSeconds
-                                sessions:     root.pomSessions
+                                sessions: root.pomSessions
                                 onStartPauseClicked: root.pomStartPause()
-                                onResetClicked:      root.pomReset()
-                                onSkipClicked:       root.pomAdvance()
+                                onResetClicked: root.pomReset()
+                                onSkipClicked: root.pomAdvance()
                             }
                         }
                     }

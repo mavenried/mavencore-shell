@@ -10,13 +10,16 @@ Item {
     required property list<var> btDevices
     signal connectRequested(string mac)
     signal disconnectRequested(string mac)
-    signal togglePowerRequested()
+    signal togglePowerRequested
 
     implicitHeight: col.implicitHeight
 
     ColumnLayout {
         id: col
-        anchors { left: parent.left; right: parent.right }
+        anchors {
+            left: parent.left
+            right: parent.right
+        }
         spacing: 12
 
         // ── Header ───────────────────────────────────────────────────
@@ -30,7 +33,9 @@ Item {
                 font.bold: true
                 color: Theme.mmry
             }
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             Rectangle {
                 width: btToggleLbl.width + 24
@@ -39,19 +44,24 @@ Item {
                 color: root.btEnabled ? Theme.mmry : Theme.sptr
                 border.color: Theme.acct
                 border.width: 2
-                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 150
+                    }
+                }
 
                 Text {
                     id: btToggleLbl
                     anchors.centerIn: parent
-                    text: root.btEnabled
-                        ? String.fromCodePoint(0xF00AF) + "  BT ON"
-                        : String.fromCodePoint(0xF00B2) + "  BT OFF"
+                    text: root.btEnabled ? String.fromCodePoint(0xF00AF) + "  BT ON" : String.fromCodePoint(0xF00B2) + "  BT OFF"
                     font.pixelSize: 13
                     font.family: Theme.font
                     color: Theme.bgnd
                 }
-                MouseArea { anchors.fill: parent; onClicked: root.togglePowerRequested() }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: root.togglePowerRequested()
+                }
             }
         }
 
@@ -85,16 +95,16 @@ Item {
                     RowLayout {
                         id: btRow
                         anchors {
-                            left: parent.left; right: parent.right
+                            left: parent.left
+                            right: parent.right
                             verticalCenter: parent.verticalCenter
-                            leftMargin: 12; rightMargin: 12
+                            leftMargin: 12
+                            rightMargin: 12
                         }
                         spacing: 8
 
                         Text {
-                            text: btItem.modelData.connected
-                                ? String.fromCodePoint(0xF00B1)
-                                : String.fromCodePoint(0xF00B2)
+                            text: btItem.modelData.connected ? String.fromCodePoint(0xF00B1) : String.fromCodePoint(0xF00B2)
                             font.pixelSize: 16
                             font.family: Theme.font
                             color: btItem.modelData.connected ? Theme.mmry : Theme.txt2
@@ -129,9 +139,7 @@ Item {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: btItem.modelData.connected
-                                    ? root.disconnectRequested(btItem.modelData.mac)
-                                    : root.connectRequested(btItem.modelData.mac)
+                                onClicked: btItem.modelData.connected ? root.disconnectRequested(btItem.modelData.mac) : root.connectRequested(btItem.modelData.mac)
                             }
                         }
                     }

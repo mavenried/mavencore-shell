@@ -10,10 +10,16 @@ Item {
     height: 0
     visible: false
 
-    function read() { return fv.text() }
-    function save(text) { _pending = text; _saveTimer.restart() }
+    property string pending: ""
 
-    property string _pending: ""
+    function read() {
+        return fv.text();
+    }
+
+    function save(content) {
+        pending = content;
+        saveTimer.restart();
+    }
 
     FileView {
         id: fv
@@ -22,8 +28,8 @@ Item {
     }
 
     Timer {
-        id: _saveTimer
+        id: saveTimer
         interval: root.saveInterval
-        onTriggered: fv.setText(root._pending)
+        onTriggered: fv.setText(root.pending)
     }
 }

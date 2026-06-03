@@ -31,28 +31,28 @@ WidgetCard {
     PolledProcess {
         command: ["playerctl", "metadata", "--format", "{{artist}}|{{title}}|{{status}}|{{mpris:length}}|{{position}}|{{mpris:artUrl}}"]
         interval: 3000
-        onReceived: function(data) {
-            var parts = data.split("|")
+        onReceived: function (data) {
+            var parts = data.split("|");
             if (parts.length < 5 || !parts[1]) {
-                root.title = "Nothing playing"
-                root.artist = ""
-                root.status = "Stopped"
-                root.lengthUs = 0
-                root.artUrl = ""
-                return
+                root.title = "Nothing playing";
+                root.artist = "";
+                root.status = "Stopped";
+                root.lengthUs = 0;
+                root.artUrl = "";
+                return;
             }
-            root.artist = parts[0]
-            root.title = parts[1]
-            root.status = parts[2]
-            root.lengthUs = parseFloat(parts[3]) || 0
-            root.positionUs = parseFloat(parts[4]) || 0
-            root.artUrl = parts[5] || ""
+            root.artist = parts[0];
+            root.title = parts[1];
+            root.status = parts[2];
+            root.lengthUs = parseFloat(parts[3]) || 0;
+            root.positionUs = parseFloat(parts[4]) || 0;
+            root.artUrl = parts[5] || "";
         }
     }
 
     function fmt(us) {
-        var s = Math.floor(us / 1000000)
-        return Math.floor(s / 60) + ":" + (s % 60).toString().padStart(2, "0")
+        var s = Math.floor(us / 1000000);
+        return Math.floor(s / 60) + ":" + (s % 60).toString().padStart(2, "0");
     }
 
     ColumnLayout {
@@ -130,7 +130,9 @@ WidgetCard {
                     radius: parent.radius
                     color: Theme.pfle
                     Behavior on width {
-                        NumberAnimation { duration: 1000 }
+                        NumberAnimation {
+                            duration: 1000
+                        }
                     }
                 }
             }
@@ -143,7 +145,9 @@ WidgetCard {
                     font.pixelSize: 10
                     font.family: Theme.font
                 }
-                Item { Layout.fillWidth: true }
+                Item {
+                    Layout.fillWidth: true
+                }
                 Text {
                     text: root.fmt(root.lengthUs)
                     color: Theme.txt2

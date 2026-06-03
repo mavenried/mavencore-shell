@@ -18,7 +18,7 @@ Singleton {
 
         stdout: SplitParser {
             onRead: function (data) {
-                root.state = JSON.parse(data)
+                root.state = JSON.parse(data);
             }
         }
     }
