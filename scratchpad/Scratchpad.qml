@@ -13,16 +13,21 @@ Scope {
 
     required property string savePath
     property bool open: false
+    property string scratchContent: ""
+
+    Component.onCompleted: {
+        scratchContent = fv.text()
+    }
 
     IpcHandler {
         id: handler
         target: "scratchpad"
         function toggle() {
-            loader.active = true;
-            root.open = !root.open;
+            root.open = !root.open
+            loader.active = true
             if (!root.open) {
-                fv.setText(text.text);
-                closeTimer.start();
+                fv.setText(root.scratchContent)
+                closeTimer.start()
             }
         }
     }
@@ -30,16 +35,12 @@ Scope {
         id: closeTimer
         interval: 250
         onTriggered: {
-            loader.active = root.open;
+            loader.active = root.open
         }
     }
     FileView {
         id: fv
-        path: Qt.resolvedUrl(root.savePath)
-        onFileChanged: text.text = fv.text()
-        onLoaded: {
-            console.log(fv.text());
-        }
+        path: root.savePath
         blockLoading: true
     }
 
@@ -59,6 +60,9 @@ Scope {
             }
             exclusiveZone: -1
             color: "transparent"
+
+            Component.onCompleted: Qt.callLater(function() { text.forceActiveFocus() })
+
             Rectangle {
                 id: inner
                 anchors.centerIn: parent
@@ -79,23 +83,12 @@ Scope {
                     }
                 }
 
-                Keys.onPressed: function (event) {
-                    console.log("Key pressed:", event.key);
-                    if (event.key === Qt.Key_Escape) {
-                        console.log("Escape pressed!");
-                        handler.toggle();
-                    }
-                }
-
                 ScrollView {
                     anchors.fill: parent
-                    focus: true
                     TextArea {
                         id: text
                         focus: true
                         padding: 20
-                        text: fv.text()
-
                         font.pixelSize: 20
                         font.family: Theme.font
                         color: Theme.txt1
@@ -106,9 +99,20 @@ Scope {
                             radius: 15
                             border.width: 2
                         }
-                        Component.onCompleted: {
-                            cursorPosition = text.text.length;
+
+                        Keys.onPressed: function(event) {
+                            if (event.key === Qt.Key_Escape) {
+                                handler.toggle()
+                                event.accepted = true
+                            }
                         }
+
+                        Component.onCompleted: {
+                            this.text = root.scratchContent
+                            cursorPosition = this.text.length
+                        }
+
+                        onTextChanged: root.scratchContent = this.text
                     }
                 }
             }
