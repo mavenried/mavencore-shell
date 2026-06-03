@@ -1,7 +1,7 @@
-# quickshell
-
-A Wayland shell built with [Quickshell](https://quickshell.outfoxxed.me/), featuring a status bar, dashboard overlay, app launcher, network manager, lock screen, OSD, and wallpaper layer.
-
+<h1 align="center">mavencore-shell</h1>
+<p align="center">
+A Wayland shell built with <a src="https://quickshell.outfoxxed.me">Quickshell</a>, featuring a status bar, dashboard overlay, app launcher, network manager, lock screen, OSD, and wallpaper layer.
+</p>
 ## Dependencies
 
 | Package                                                  | Purpose                                               |

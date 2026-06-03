@@ -3,6 +3,7 @@ import Quickshell
 import qs.bar
 import qs.notifyd
 import qs.launcher
+import qs.network
 import qs.osd
 import qs.wallpaper
 import qs.lockscreen
