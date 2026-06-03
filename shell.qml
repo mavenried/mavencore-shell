@@ -5,8 +5,8 @@ import qs.notifyd
 import qs.launcher
 import qs.osd
 import qs.wallpaper
-import qs.scratchpad
 import qs.lockscreen
+import qs.dashboard
 
 ShellRoot {
 
@@ -14,8 +14,11 @@ ShellRoot {
         wallpaperPath: "/mnt/DATA/Pictures/CURRENT"
         showTime: true
     }
-    Scratchpad {
-        savePath: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
+    Dashboard {
+        diskPaths: ["/", "/mnt/DATA"]
+        scratchpadPath: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
+        todoPath: "/mnt/DATA/Documents/scratches/.mavencore-todo"
+        networkIface: "wlan0"
     }
     NetworkManager {}
     Bar {
