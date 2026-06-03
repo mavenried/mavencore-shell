@@ -1,15 +1,10 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Io
 import qs
 
-Rectangle {
+WidgetCard {
     id: root
-    color: "#1c1c1c"
-    radius: Theme.radius
-    border.color: Theme.sptr
-    border.width: 1
 
     property string iface: "wlan0"
     property real rxSpeed: 0
@@ -24,35 +19,25 @@ Rectangle {
         return "0 KB/s"
     }
 
-    Timer {
-        interval: 2000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: { netProc.running = false; netProc.running = true }
-    }
-
-    Process {
-        id: netProc
+    PolledProcess {
         command: ["sh", "-c", "grep '" + root.iface + ":' /proc/net/dev | awk '{print $2, $10}'"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                var parts = this.text.trim().split(/\s+/)
-                if (parts.length < 2) return
-                var rx = parseFloat(parts[0])
-                var tx = parseFloat(parts[1])
-                var now = Date.now()
-                if (root.rxPrev >= 0 && root.prevTime > 0) {
-                    var dt = (now - root.prevTime) / 1000
-                    if (dt > 0) {
-                        root.rxSpeed = Math.max(0, (rx - root.rxPrev) / dt)
-                        root.txSpeed = Math.max(0, (tx - root.txPrev) / dt)
-                    }
+        interval: 2000
+        onReceived: function(data) {
+            var parts = data.split(/\s+/)
+            if (parts.length < 2) return
+            var rx = parseFloat(parts[0])
+            var tx = parseFloat(parts[1])
+            var now = Date.now()
+            if (root.rxPrev >= 0 && root.prevTime > 0) {
+                var dt = (now - root.prevTime) / 1000
+                if (dt > 0) {
+                    root.rxSpeed = Math.max(0, (rx - root.rxPrev) / dt)
+                    root.txSpeed = Math.max(0, (tx - root.txPrev) / dt)
                 }
-                root.rxPrev = rx
-                root.txPrev = tx
-                root.prevTime = now
             }
+            root.rxPrev = rx
+            root.txPrev = tx
+            root.prevTime = now
         }
     }
 
@@ -72,7 +57,7 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             Text {
-                text: "↓  " + root.iface
+                text: String.fromCodePoint(0x2193) + "  " + root.iface
                 color: Theme.wifi
                 font.pixelSize: 13
                 font.family: Theme.font
@@ -89,7 +74,7 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             Text {
-                text: "↑  " + root.iface
+                text: String.fromCodePoint(0x2191) + "  " + root.iface
                 color: Theme.uptm
                 font.pixelSize: 13
                 font.family: Theme.font

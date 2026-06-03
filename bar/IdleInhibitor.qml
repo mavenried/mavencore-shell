@@ -13,7 +13,7 @@ Item {
     Module {
         id: content
 
-        label: IdleInhibitorState.active ? "   on" : "  off"
+        label: IdleInhibitorState.active ? String.fromCodePoint(0xF0F4) + "   on" : String.fromCodePoint(0xF0F4) + "  off"
         labelColor: root.labelColor
     }
 

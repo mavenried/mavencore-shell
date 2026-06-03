@@ -11,26 +11,21 @@ import qs
 Scope {
     id: root
 
-    property bool open: false
+    OverlayToggle {
+        id: ot
+        loader: loader
+        closeDelay: 250
+    }
 
     IpcHandler {
         target: "network-manager"
         function toggle() {
-            loader.active = true;
-            root.open = !root.open;
-            if (!root.open) {
-                closeTimer.start();
-            } else {
-                Network.rescanWifi();
-                btRefreshTimer.start();
+            ot.toggle()
+            if (ot.open) {
+                Network.rescanWifi()
+                btRefreshTimer.start()
             }
         }
-    }
-
-    Timer {
-        id: closeTimer
-        interval: 250
-        onTriggered: loader.active = root.open
     }
 
     // Bluetooth polling
@@ -38,7 +33,7 @@ Scope {
         id: btRefreshTimer
         interval: 3000
         repeat: true
-        running: root.open
+        running: ot.open
         onTriggered: btDevicesProc.running = true
     }
 
@@ -145,7 +140,7 @@ Scope {
         PanelWindow {
             id: win
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: ot.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
             anchors {
                 top: true
                 left: true
@@ -158,10 +153,7 @@ Scope {
             // Click outside to close
             MouseArea {
                 anchors.fill: parent
-                onClicked: {
-                    root.open = false;
-                    closeTimer.start();
-                }
+                onClicked: ot.setOpen(false)
             }
 
             Rectangle {
@@ -174,8 +166,8 @@ Scope {
                 border.color: Theme.acct
                 border.width: 2
 
-                opacity: root.open ? 1 : 0
-                scale: root.open ? 1 : 0.96
+                opacity: ot.open ? 1 : 0
+                scale: ot.open ? 1 : 0.96
 
                 Behavior on opacity {
                     OpacityAnimator {
@@ -200,8 +192,7 @@ Scope {
                             root.showPasswordDialog = false;
                             root.pendingSsid = "";
                         } else {
-                            root.open = false;
-                            closeTimer.start();
+                            ot.setOpen(false)
                         }
                     }
                 }
@@ -221,7 +212,7 @@ Scope {
                     RowLayout {
                         Layout.fillWidth: true
                         Text {
-                            text: "󰖩  Network"
+                            text: String.fromCodePoint(0xF05A9) + "  Network"
                             font.pixelSize: 18
                             font.family: Theme.font
                             font.bold: true
@@ -246,7 +237,7 @@ Scope {
                             Text {
                                 id: toggle
                                 anchors.centerIn: parent
-                                text: Network.wifiEnabled ? "󰖩  Wi-Fi ON" : "󰖪  Wi-Fi OFF"
+                                text: Network.wifiEnabled ? String.fromCodePoint(0xF05A9) + "  Wi-Fi ON" : String.fromCodePoint(0xF05AA) + "  Wi-Fi OFF"
                                 font.pixelSize: 13
                                 font.family: Theme.font
                                 color: Theme.bgnd
@@ -267,7 +258,7 @@ Scope {
                             Text {
                                 id: scanLbl
                                 anchors.centerIn: parent
-                                text: Network.scanning ? "󰑐  scanning…" : "󰑐  scan"
+                                text: Network.scanning ? String.fromCodePoint(0xF0450) + "  scanning" + String.fromCodePoint(0x2026) : String.fromCodePoint(0xF0450) + "  scan"
                                 font.pixelSize: 13
                                 font.family: Theme.font
                                 color: Network.scanning ? Theme.mmry : Theme.txt2
@@ -286,7 +277,7 @@ Scope {
                         text: root.statusMessage
                         font.pixelSize: 13
                         font.family: Theme.font
-                        color: root.statusMessage.startsWith("✗") ? Theme.bat5 : Theme.bat1
+                        color: root.statusMessage.startsWith(String.fromCodePoint(0x2717)) ? Theme.bat5 : Theme.bat1
                         Layout.fillWidth: true
                     }
 
@@ -343,12 +334,12 @@ Scope {
                                         text: {
                                             const s = netItem.modelData.strength;
                                             if (s >= 75)
-                                                return "󰤨";
+                                                return String.fromCodePoint(0xF0928);
                                             if (s >= 50)
-                                                return "󰤥";
+                                                return String.fromCodePoint(0xF0925);
                                             if (s >= 25)
-                                                return "󰤢";
-                                            return "󰤟";
+                                                return String.fromCodePoint(0xF0922);
+                                            return String.fromCodePoint(0xF091F);
                                         }
                                         font.pixelSize: 16
                                         font.family: Theme.font
@@ -369,7 +360,7 @@ Scope {
                                     // Saved indicator
                                     Text {
                                         visible: Network.hasSavedProfile(netItem.modelData.ssid) && !netItem.modelData.active
-                                        text: "󰄬"
+                                        text: String.fromCodePoint(0xF012C)
                                         font.pixelSize: 12
                                         font.family: Theme.font
                                         color: Theme.bat1
@@ -378,7 +369,7 @@ Scope {
                                     // Lock icon
                                     Text {
                                         visible: netItem.modelData.security && netItem.modelData.security !== "--" && netItem.modelData.security.length > 0
-                                        text: "󰌾"
+                                        text: String.fromCodePoint(0xF033E)
                                         font.pixelSize: 12
                                         font.family: Theme.font
                                         color: Theme.txt2
@@ -411,7 +402,7 @@ Scope {
                                         Text {
                                             id: btnLbl
                                             anchors.centerIn: parent
-                                            text: netItem.modelData.active ? "disconnect" : root.connecting && root.pendingSsid === netItem.modelData.ssid ? "connecting…" : "connect"
+                                            text: netItem.modelData.active ? "disconnect" : root.connecting && root.pendingSsid === netItem.modelData.ssid ? "connecting" + String.fromCodePoint(0x2026) : "connect"
                                             font.pixelSize: 12
                                             font.family: Theme.font
                                             color: netItem.modelData.active ? "#eeeeee" : Theme.txt2
@@ -424,7 +415,7 @@ Scope {
                                                 if (netItem.modelData.active) {
                                                     const iface = Network.wirelessInterfaces.length > 0 ? Network.wirelessInterfaces[0].device : "";
                                                     Network.disconnect(iface, cb => {
-                                                        root.statusMessage = cb.success ? "✓ Disconnected" : "✗ " + (cb.error || "Failed");
+                                                        root.statusMessage = cb.success ? String.fromCodePoint(0x2713) + " Disconnected" : String.fromCodePoint(0x2717) + " " + (cb.error || "Failed");
                                                         msgTimer.restart();
                                                     });
                                                 } else {
@@ -439,7 +430,7 @@ Scope {
                                                         } else {
                                                             root.connecting = false;
                                                             root.pendingSsid = "";
-                                                            root.statusMessage = result.success ? "✓ Connected to " + netItem.modelData.ssid : "✗ " + (result.error || "Failed");
+                                                            root.statusMessage = result.success ? String.fromCodePoint(0x2713) + " Connected to " + netItem.modelData.ssid : String.fromCodePoint(0x2717) + " " + (result.error || "Failed");
                                                             msgTimer.restart();
                                                         }
                                                     }, netItem.modelData.bssid ?? "");
@@ -455,7 +446,7 @@ Scope {
                     // Wifi disabled notice
                     Text {
                         visible: !Network.wifiEnabled
-                        text: "󰖪  Wi-Fi is disabled"
+                        text: String.fromCodePoint(0xF05AA) + "  Wi-Fi is disabled"
                         font.pixelSize: 14
                         font.family: Theme.font
                         color: Theme.txt2
@@ -481,7 +472,7 @@ Scope {
                             spacing: 8
 
                             Text {
-                                text: "󰌾  Password for <b>" + root.pendingSsid + "</b>"
+                                text: String.fromCodePoint(0xF033E) + "  Password for <b>" + root.pendingSsid + "</b>"
                                 font.pixelSize: 13
                                 font.family: Theme.font
                                 color: Theme.txt1
@@ -575,7 +566,7 @@ Scope {
                     RowLayout {
                         Layout.fillWidth: true
                         Text {
-                            text: "󰂯  Bluetooth"
+                            text: String.fromCodePoint(0xF00AF) + "  Bluetooth"
                             font.pixelSize: 18
                             font.family: Theme.font
                             font.bold: true
@@ -599,7 +590,7 @@ Scope {
                             Text {
                                 id: btToggleLbl
                                 anchors.centerIn: parent
-                                text: root.bluetoothEnabled ? "󰂯  BT ON" : "󰂲  BT OFF"
+                                text: root.bluetoothEnabled ? String.fromCodePoint(0xF00AF) + "  BT ON" : String.fromCodePoint(0xF00B2) + "  BT OFF"
                                 font.pixelSize: 13
                                 font.family: Theme.font
                                 color: Theme.bgnd
@@ -661,7 +652,7 @@ Scope {
                                     spacing: 8
 
                                     Text {
-                                        text: btItem.modelData.connected ? "󰂱" : "󰂲"
+                                        text: btItem.modelData.connected ? String.fromCodePoint(0xF00B1) : String.fromCodePoint(0xF00B2)
                                         font.pixelSize: 16
                                         font.family: Theme.font
                                         color: btItem.modelData.connected ? Theme.mmry : Theme.txt2
@@ -722,7 +713,7 @@ Scope {
 
                     Text {
                         visible: !root.bluetoothEnabled
-                        text: "󰂲  Bluetooth is disabled"
+                        text: String.fromCodePoint(0xF00B2) + "  Bluetooth is disabled"
                         font.pixelSize: 14
                         font.family: Theme.font
                         color: Theme.txt2
@@ -750,7 +741,7 @@ Scope {
                 root.connecting = true;
                 Network.connectToNetwork(root.pendingSsid, pwd, root.pendingBssid, result => {
                     root.connecting = false;
-                    root.statusMessage = result.success ? "✓ Connected to " + root.pendingSsid : "✗ " + (result.error || "Failed to connect");
+                    root.statusMessage = result.success ? String.fromCodePoint(0x2713) + " Connected to " + root.pendingSsid : String.fromCodePoint(0x2717) + " " + (result.error || "Failed to connect");
                     msgTimer.restart();
                     root.pendingSsid = "";
                 });

@@ -9,7 +9,6 @@ import qs
 Scope {
     id: root
 
-    property bool open: false
     property list<string> diskPaths: ["/"]
     property string weatherLocation: ""
     property string scratchpadPath: ""
@@ -17,33 +16,33 @@ Scope {
     property string networkIface: "wlan0"
 
     // ── Weather cache (outside LazyLoader — persists across open/close) ──────
-    property string wxLocation: "—"
-    property string wxTemp: "—°C"
-    property string wxFeelsLike: "—°C"
-    property string wxCondition: "—"
-    property string wxHumidity: "—%"
-    property string wxWind: "— km/h"
-    property string wxIcon: "🌡"
+    property string wxLocation: String.fromCodePoint(0x2014)
+    property string wxTemp: String.fromCodePoint(0x2014) + String.fromCodePoint(0xB0) + "C"
+    property string wxFeelsLike: String.fromCodePoint(0x2014) + String.fromCodePoint(0xB0) + "C"
+    property string wxCondition: String.fromCodePoint(0x2014)
+    property string wxHumidity: String.fromCodePoint(0x2014) + "%"
+    property string wxWind: String.fromCodePoint(0x2014) + " km/h"
+    property string wxIcon: String.fromCodePoint(0x1F321)
 
     function wxCodeToIcon(code) {
-        console.log(code);
-        if (code === 113)
-            return "☀";
-        if (code === 116)
-            return "⛅";
-        if (code >= 119 && code <= 122)
-            return "☁";
-        if (code >= 248 && code <= 260)
-            return "🌫";
-        if (code >= 263 && code <= 296)
-            return "🌦";
-        if (code >= 299 && code <= 321)
-            return "🌧";
-        if (code >= 323 && code <= 377)
-            return "❄";
-        if (code === 200 || code >= 386)
-            return "⛈";
-        return "🌡";
+        if (code === 113) return String.fromCodePoint(0x2600)   // ☀  Clear
+        if (code === 116) return String.fromCodePoint(0x26C5)   // ⛅ Partly cloudy
+        if (code === 119 || code === 122) return String.fromCodePoint(0x2601)  // ☁  Cloudy/Overcast
+        if (code === 143 || code === 248 || code === 260) return String.fromCodePoint(0x1F32B) // 🌫 Mist/Fog
+        if (code === 200 || code >= 386) return String.fromCodePoint(0x26C8)   // ⛈ Thunder
+        // Snow: patchy/blowing/blizzard, sleet, ice, snow showers
+        if (code === 179 || code === 182 || code === 227 || code === 230 ||
+            code === 317 || code === 320 ||
+            (code >= 323 && code <= 350) ||
+            (code >= 362 && code <= 377))
+            return String.fromCodePoint(0x2744)  // ❄  Snow/Sleet/Ice
+        // Rain: heavy showers, moderate+
+        if ((code >= 299 && code <= 314) || code === 356 || code === 359)
+            return String.fromCodePoint(0x1F327) // 🌧 Rain
+        // Light rain/drizzle: patchy, freezing drizzle, light drizzle, light showers
+        if (code === 176 || code === 185 || (code >= 263 && code <= 296) || code === 353)
+            return String.fromCodePoint(0x1F326) // 🌦 Light rain
+        return String.fromCodePoint(0x1F321)     // 🌡 default
     }
 
     Timer {
@@ -67,8 +66,8 @@ Scope {
                     var c = d.current_condition[0];
                     var a = d.nearest_area[0];
                     root.wxLocation = a.areaName[0].value + ", " + a.country[0].value;
-                    root.wxTemp = c.temp_C + "°C";
-                    root.wxFeelsLike = c.FeelsLikeC + "°C";
+                    root.wxTemp = c.temp_C + String.fromCodePoint(0xB0) + "C";
+                    root.wxFeelsLike = c.FeelsLikeC + String.fromCodePoint(0xB0) + "C";
                     root.wxCondition = c.weatherDesc[0].value;
                     root.wxHumidity = c.humidity + "%";
                     root.wxWind = c.windspeedKmph + " km/h";
@@ -136,21 +135,16 @@ Scope {
     }
 
     // ── IPC / lifecycle ──────────────────────────────────────────────────────
+    OverlayToggle {
+        id: ot
+        loader: loader
+        closeDelay: 300
+    }
+
     IpcHandler {
         id: handler
         target: "dashboard"
-        function toggle() {
-            root.open = !root.open;
-            loader.active = true;
-            if (!root.open)
-                closeTimer.start();
-        }
-    }
-
-    Timer {
-        id: closeTimer
-        interval: 300
-        onTriggered: loader.active = root.open
+        function toggle() { ot.toggle() }
     }
 
     // ── UI ───────────────────────────────────────────────────────────────────
@@ -160,7 +154,7 @@ Scope {
         PanelWindow {
             id: dashWindow
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: ot.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
             anchors {
                 top: true
@@ -190,7 +184,7 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     color: Qt.rgba(0, 0, 0, 0.72)
-                    opacity: root.open ? 1 : 0
+                    opacity: ot.open ? 1 : 0
                     Behavior on opacity {
                         OpacityAnimator {
                             duration: 280
@@ -208,8 +202,8 @@ Scope {
                     width: 16 * 100
                     height: 9 * 100
 
-                    opacity: root.open ? 1 : 0
-                    scale: root.open ? 1.0 : 0.94
+                    opacity: ot.open ? 1 : 0
+                    scale: ot.open ? 1.0 : 0.94
 
                     Behavior on opacity {
                         OpacityAnimator {

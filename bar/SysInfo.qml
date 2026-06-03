@@ -6,29 +6,7 @@ Rectangle {
     id: root
     property bool showBattery: true
     property bool showPower: true
-    property string batteryPath: "/sys/class/power_supply/BAT1"
     property string diskPath: "/"
-
-    property string cpu: " ---%"
-    property string ram: " ---%"
-    property string dsk: "󰋊 ---%"
-    property string bat: "󰁾 ---%"
-    property string bat_icon
-    property string pow: "󱐋 --W"
-
-    function getBatteryColor() {
-        var num = battery.label.replace(/[^\d]/g, "");
-        if (10 > num)
-            return Theme.bat5;
-        else if (25 > num)
-            return Theme.bat4;
-        else if (50 > num)
-            return Theme.bat3;
-        else if (75 > num)
-            return Theme.bat2;
-        else if (100 >= num)
-            return Theme.bat1;
-    }
 
     color: Theme.bgnd
     border.color: Theme.acct
@@ -39,74 +17,40 @@ Rectangle {
 
     Row {
         id: content
-
         spacing: 0
 
-        CommandMonitor {
-            label: root.cpu
+        Module {
+            label: String.fromCodePoint(0xF4BC) + " " + SysStats.cpu.toFixed(0).padStart(3, " ") + "%"
             labelColor: Theme.cpuc
             drawBox: false
-            template: " %3s%"
-            command: ["mavencore", "cpu"]
         }
 
-        CommandMonitor {
-            label: root.ram
+        Module {
+            label: String.fromCodePoint(0xEFC5) + " " + SysStats.ram.toFixed(0).padStart(3, " ") + "%"
             labelColor: Theme.mmry
             drawBox: false
-            template: " %3s%"
-            command: ["mavencore", "memory"]
         }
 
         CommandMonitor {
-            label: root.dsk
             labelColor: Theme.disk
             drawBox: false
-            template: "󰋊 %3s%"
+            label: String.fromCodePoint(0xF02CA) + " ---%"
+            template: String.fromCodePoint(0xF02CA) + " %3s%"
             command: ["mavencore", "disk", root.diskPath]
         }
 
-        CommandMonitor {
-            id: battery
+        Module {
             visible: root.showBattery
-
-            label: root.bat
-            labelColor: root.getBatteryColor()
+            label: BatteryStats.icon + " " + BatteryStats.level.toFixed(0).padStart(3, " ") + "%"
+            labelColor: BatteryStats.levelColor
             drawBox: false
-            template: root.bat_icon + " %3s%"
-            command: ["mavencore", "battery", root.batteryPath]
         }
 
-        CommandMonitor {
+        Module {
             visible: root.showBattery && root.showPower
-            label: root.pow
+            label: String.fromCodePoint(0xF140B) + " " + BatteryStats.watts.toFixed(0).padStart(2, " ") + "W"
             labelColor: Theme.powr
             drawBox: false
-            template: "󱐋 %2sW"
-            command: ["mavencore", "power", root.batteryPath]
         }
-    }
-
-    // Connections {
-    //     target: battery
-    //     onLabelChanged: root.bat = battery.label
-    // }
-
-    Process {
-        id: updater
-
-        running: true
-        command: ["mavencore", "battery-icon", root.batteryPath]
-
-        stdout: StdioCollector {
-            onStreamFinished: root.bat_icon = this.text.trim()
-        }
-    }
-
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: updater.running = true
     }
 }

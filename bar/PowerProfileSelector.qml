@@ -8,11 +8,11 @@ Item {
     function getIcon() {
         var mode = PowerProfiles.profile;
         if (mode == PowerProfile.PowerSaver)
-            return "󰾆 ps";
+            return String.fromCodePoint(0xF0F86) + " ps";
         else if (mode == PowerProfile.Performance)
-            return "󰓅 pf";
+            return String.fromCodePoint(0xF04C5) + " pf";
         else if (mode == PowerProfile.Balanced)
-            return "󰾅 bl";
+            return String.fromCodePoint(0xF0F85) + " bl";
     }
 
     function setNextMode() {

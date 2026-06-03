@@ -3,12 +3,8 @@ import QtQuick
 import QtQuick.Layouts
 import qs
 
-Rectangle {
+WidgetCard {
     id: root
-    color: "#1c1c1c"
-    radius: Theme.radius
-    border.color: Theme.sptr
-    border.width: 1
 
     required property string phase       // "idle" | "work" | "break" | "longBreak"
     required property bool   paused
@@ -73,7 +69,7 @@ Rectangle {
 
                     ctx.beginPath()
                     ctx.arc(cx, cy, r, 0, 2 * Math.PI)
-                    ctx.strokeStyle = "#2a2a2a"
+                    ctx.strokeStyle = Theme.bgnd3.toString()
                     ctx.lineWidth = 8
                     ctx.stroke()
 
@@ -124,7 +120,7 @@ Rectangle {
                     width: 8; height: 8; radius: 4
                     color: {
                         if (root.phase === "longBreak") return root.phaseColor
-                        return (root.sessions % 4) > index ? root.phaseColor : "#2a2a2a"
+                        return (root.sessions % 4) > index ? root.phaseColor : Theme.bgnd3
                     }
                 }
             }

@@ -8,6 +8,13 @@ Scope {
     required property string diskPath
     property bool showBattery: true
     property bool showPower: true
+
+    Binding {
+        target: BatteryStats
+        property: "batteryPath"
+        value: scope.batteryPath
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -18,7 +25,7 @@ Scope {
 
             function truncate(str, n) {
                 if (str.length > n) {
-                    return str.slice(0, n - 1) + "…";
+                    return str.slice(0, n - 1) + String.fromCodePoint(0x2026);
                 }
                 return str;
             }
@@ -45,8 +52,8 @@ Scope {
                     labelColor: Theme.dstr
                     command: ["zsh", "-c", "checkupdates | wc -l "]
                     onclick: ["ghostty", "-e", "yay", "-Syu", "--noconfirm"]
-                    template: " %3s"
-                    label: " ---"
+                    template: String.fromCodePoint(0xF303) + " %3s"
+                    label: String.fromCodePoint(0xF303) + " ---"
                     interval: 5000
                 }
 
@@ -88,7 +95,6 @@ Scope {
                 bottomPadding: 0
 
                 SysInfo {
-                    batteryPath: scope.batteryPath
                     diskPath: scope.diskPath
                     showBattery: scope.showBattery
                     showPower: scope.showPower
@@ -105,18 +111,16 @@ Scope {
                 CommandMonitor {
                     labelColor: Theme.wifi
                     command: ["zsh", "-c", "~/.config/quickshell/scripts/qs-online"]
-                    label: "󰖟 offline"
+                    label: String.fromCodePoint(0xF059F) + " offline"
 
                     onclick: ["qs", "ipc", "call", "network-manager", "toggle"]
                     interval: 1000
                     template: "%s<b> " + root.truncate(Network.active ? Network.active.ssid : "---", 15) + "</b>"
                 }
 
-                CommandMonitor {
+                Module {
+                    label: String.fromCodePoint(0xF102) + " " + Uptime.text
                     labelColor: Theme.uptm
-                    command: ["mavencore", "uptime"]
-                    template: " %s"
-                    label: " --:--:--:--"
                 }
 
                 PowerProfileSelector {}

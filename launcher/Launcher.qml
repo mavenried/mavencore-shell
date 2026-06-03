@@ -37,7 +37,6 @@ Scope {
         return score;
     }
 
-    property bool open: false
     property bool cmdMode: false
     property bool clcMode: false
     property string clcResult: ""
@@ -108,30 +107,27 @@ Scope {
         }
     }
 
+    OverlayToggle {
+        id: ot
+        loader: loader
+        closeDelay: 300
+    }
+
     IpcHandler {
         id: handler
         target: "launcher"
         function open() {
-            loader.active = true;
-            root.open = true;
-            proc.running = true;
-            root.apps = [];
+            ot.setOpen(true)
+            proc.running = true
+            root.apps = []
         }
 
         function close() {
-            closeTimer.start();
-            root.open = false;
-            root.apps = [];
-            root.searchText = "";
-            root.cmdMode = false;
-            root.clcMode = false;
-        }
-    }
-    Timer {
-        id: closeTimer
-        interval: 300
-        onTriggered: {
-            loader.active = root.open;
+            ot.setOpen(false)
+            root.apps = []
+            root.searchText = ""
+            root.cmdMode = false
+            root.clcMode = false
         }
     }
     LazyLoader {
@@ -139,7 +135,7 @@ Scope {
         PanelWindow {
             id: runnerWindow
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: ot.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
             implicitHeight: 600
 
             anchors {
@@ -161,7 +157,7 @@ Scope {
                 border.color: Theme.acct
                 border.width: 2
 
-                opacity: root.open ? 1 : 0
+                opacity: ot.open ? 1 : 0
 
                 Behavior on opacity {
                     OpacityAnimator {

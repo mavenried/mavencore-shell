@@ -2,29 +2,16 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell.Io
 import qs
 
-Rectangle {
+WidgetCard {
     id: root
     required property string savePath
 
-    color: "#1c1c1c"
-    radius: Theme.radius
-    border.color: Theme.sptr
-    border.width: 1
-
-    FileView {
-        id: fv
+    PersistentFile {
+        id: pf
         path: root.savePath
-        blockLoading: true
-    }
-
-    // Debounce: save 1s after the last keystroke
-    Timer {
-        id: saveTimer
-        interval: 1000
-        onTriggered: fv.setText(editor.text)
+        saveInterval: 1000
     }
 
     ColumnLayout {
@@ -35,7 +22,7 @@ Rectangle {
         Text {
             text: "Notes"
             color: Theme.txt1
-            font.pixelSize: 15
+            font.pixelSize: 20
             font.bold: true
             font.family: Theme.font
         }
@@ -54,18 +41,18 @@ Rectangle {
                     id: editor
                     padding: 4
                     color: Theme.txt1
-                    font.pixelSize: 14
+                    font.pixelSize: 16
                     font.family: Theme.font
                     wrapMode: TextArea.Wrap
                     background: null
                     selectByMouse: true
 
                     Component.onCompleted: {
-                        this.text = fv.text()
+                        this.text = pf.read()
                         cursorPosition = this.text.length
                     }
 
-                    onTextChanged: saveTimer.restart()
+                    onTextChanged: pf.save(editor.text)
                 }
             }
         }

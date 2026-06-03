@@ -3,21 +3,17 @@ import QtQuick
 import QtQuick.Layouts
 import qs
 
-Rectangle {
+WidgetCard {
     id: root
-    color: "#1c1c1c"
-    radius: Theme.radius
-    border.color: Theme.sptr
-    border.width: 1
 
     // All data is pushed in from Dashboard scope (lives outside LazyLoader)
-    property string weatherLocation: "—"
-    property string temperature: "—°C"
-    property string feelsLike: "—°C"
-    property string condition: "—"
-    property string humidity: "—%"
-    property string windSpeed: "— km/h"
-    property string icon: "🌡"
+    property string weatherLocation: String.fromCodePoint(0x2014)
+    property string temperature: String.fromCodePoint(0x2014) + String.fromCodePoint(0xB0) + "C"
+    property string feelsLike: String.fromCodePoint(0x2014) + String.fromCodePoint(0xB0) + "C"
+    property string condition: String.fromCodePoint(0x2014)
+    property string humidity: String.fromCodePoint(0x2014) + "%"
+    property string windSpeed: String.fromCodePoint(0x2014) + " km/h"
+    property string icon: String.fromCodePoint(0x1F321)
 
     ColumnLayout {
         anchors.fill: parent
@@ -68,13 +64,13 @@ Rectangle {
         RowLayout {
             spacing: 16
             Text {
-                text: "󰖌 " + root.humidity
+                text: String.fromCodePoint(0xF058C) + " " + root.humidity
                 color: Theme.txt2
                 font.pixelSize: 12
                 font.family: Theme.font
             }
             Text {
-                text: " " + root.windSpeed
+                text: String.fromCodePoint(0xEF16) + " " + root.windSpeed
                 color: Theme.txt2
                 font.pixelSize: 12
                 font.family: Theme.font

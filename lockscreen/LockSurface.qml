@@ -8,6 +8,7 @@ Item {
     id: root
 
     required property var context
+    property string blurPath: ""
 
     property string fpState: "idle"
     property bool pwFailed: false
@@ -15,7 +16,6 @@ Item {
 
     property string currentHour: Qt.formatTime(new Date(), "hh")
     property string currentMinute: Qt.formatTime(new Date(), "mm")
-    property string uptimeText: ""
     property string batteryText: ""
 
     Timer {
@@ -28,24 +28,6 @@ Item {
         }
     }
 
-    Timer {
-        interval: 500
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: uptimeProc.running = true
-    }
-    Process {
-        id: uptimeProc
-        command: ["zsh", "-c", "mavencore uptime"]
-        stdout: SplitParser {
-            onRead: data => root.uptimeText = " " + data.trim()
-        }
-    }
-    // process {
-    //     id: getUsername
-    //     command:
-    // }
 
     Timer {
         interval: 5000
@@ -122,7 +104,7 @@ Item {
     Image {
         id: wallpaper
         anchors.fill: parent
-        source: "file:///mnt/DATA/Pictures/CURRENT_BLUR"
+        source: root.blurPath ? "file://" + root.blurPath : ""
         visible: true
     }
     Item {
@@ -194,7 +176,7 @@ Item {
         Text {
             x: 500 - implicitWidth / 2
             y: -200 - implicitHeight / 2
-            text: root.uptimeText
+            text: Uptime.text
             font {
                 pointSize: 25
                 family: "JetBrains Mono Nerd Font"

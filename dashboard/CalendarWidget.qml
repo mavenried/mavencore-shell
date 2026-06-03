@@ -4,12 +4,8 @@ import QtQuick.Layouts
 import Quickshell
 import qs
 
-Rectangle {
+WidgetCard {
     id: root
-    color: "#1c1c1c"
-    radius: Theme.radius
-    border.color: Theme.sptr
-    border.width: 1
 
     property var today: new Date()
     property int viewYear: today.getFullYear()
@@ -40,7 +36,7 @@ Rectangle {
             Layout.fillWidth: true
 
             Text {
-                text: "‹"
+                text: String.fromCodePoint(0x2039)
                 color: Theme.txt2
                 font.pixelSize: 20
                 font.family: Theme.font
@@ -66,7 +62,7 @@ Rectangle {
             Item { Layout.fillWidth: true }
 
             Text {
-                text: "›"
+                text: String.fromCodePoint(0x203A)
                 color: Theme.txt2
                 font.pixelSize: 20
                 font.family: Theme.font
@@ -117,7 +113,7 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 24
                     radius: 5
-                    color: isToday ? Theme.wifi : "transparent"
+                    color: isToday ? Theme.mmry : "transparent"
 
                     Text {
                         anchors.centerIn: parent

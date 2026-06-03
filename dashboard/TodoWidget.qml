@@ -2,67 +2,42 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell.Io
 import qs
 
-Rectangle {
+WidgetCard {
     id: root
     required property string savePath
-
-    color: "#1c1c1c"
-    radius: Theme.radius
-    border.color: Theme.sptr
-    border.width: 1
 
     implicitHeight: layout.implicitHeight + 28
 
     property var items: []
 
-    FileView {
-        id: fv
+    PersistentFile {
+        id: pf
         path: root.savePath
-        blockLoading: true
+        saveInterval: 400
     }
 
-    Timer {
-        id: saveTimer
-        interval: 400
-        onTriggered: {
-            var lines = root.items.map(function (i) {
-                if (i.type === "group")
-                    return "# " + i.text;
-                return (i.done ? "[x] " : "[ ] ") + i.text;
-            });
-            var text = lines.join("\n");
-            fv.setText(text.length ? text + "\n" : "");
-        }
+    function _serialize() {
+        var lines = root.items.map(function (i) {
+            if (i.type === "group")
+                return "# " + i.text;
+            return (i.done ? "[x] " : "[ ] ") + i.text;
+        });
+        var text = lines.join("\n");
+        pf.save(text.length ? text + "\n" : "");
     }
 
     Component.onCompleted: {
-        var lines = fv.text().split("\n").filter(l => l.trim());
+        var lines = pf.read().split("\n").filter(l => l.trim());
         root.items = lines.map(function (l) {
             if (l.startsWith("# "))
-                return {
-                    type: "group",
-                    text: l.slice(2)
-                };
+                return { type: "group", text: l.slice(2) };
             if (l.startsWith("[x] "))
-                return {
-                    type: "item",
-                    done: true,
-                    text: l.slice(4)
-                };
+                return { type: "item", done: true,  text: l.slice(4) };
             if (l.startsWith("[ ] "))
-                return {
-                    type: "item",
-                    done: false,
-                    text: l.slice(4)
-                };
-            return {
-                type: "item",
-                done: false,
-                text: l
-            };
+                return { type: "item", done: false, text: l.slice(4) };
+            return { type: "item", done: false, text: l };
         });
     }
 
@@ -89,7 +64,6 @@ Rectangle {
                 required property int index
 
                 Layout.fillWidth: true
-                // Height follows whichever row is active — no fixed size
                 implicitHeight: modelData.type === "group" ? groupRow.implicitHeight + (index > 0 ? 12 : 0) : itemRow.implicitHeight + 4
 
                 // ── Group header ─────────────────────────────────────
@@ -106,8 +80,8 @@ Rectangle {
 
                     Text {
                         text: entry.modelData.text.toUpperCase()
-                        color: Theme.wifi
-                        font.pixelSize: 11
+                        color: Theme.mmry
+                        font.pixelSize: 14
                         font.bold: true
                         font.family: Theme.font
                         font.letterSpacing: 1
@@ -120,7 +94,7 @@ Rectangle {
                         Layout.alignment: Qt.AlignVCenter
                     }
                     Text {
-                        text: "×"
+                        text: String.fromCodePoint(0xD7)
                         color: Theme.sptr
                         font.pixelSize: 13
                         font.family: Theme.font
@@ -131,7 +105,7 @@ Rectangle {
                                 var a = root.items.slice();
                                 a.splice(entry.index, 1);
                                 root.items = a;
-                                saveTimer.restart();
+                                root._serialize();
                             }
                         }
                     }
@@ -160,7 +134,7 @@ Rectangle {
                         border.width: 1
                         Text {
                             anchors.centerIn: parent
-                            text: "✓"
+                            text: String.fromCodePoint(0x2713)
                             color: Theme.bgnd
                             font.pixelSize: 12
                             visible: entry.modelData.done
@@ -174,11 +148,11 @@ Rectangle {
                         font.pixelSize: 16
                         font.family: Theme.font
                         font.strikeout: entry.modelData.done
-                        wrapMode: Text.Wrap   // expands vertically instead of cutting off
+                        wrapMode: Text.Wrap
                     }
 
                     Text {
-                        text: "×"
+                        text: String.fromCodePoint(0xD7)
                         color: Theme.sptr
                         font.pixelSize: 16
                         font.family: Theme.font
@@ -190,7 +164,7 @@ Rectangle {
                                 var a = root.items.slice();
                                 a.splice(entry.index, 1);
                                 root.items = a;
-                                saveTimer.restart();
+                                root._serialize();
                             }
                         }
                     }
@@ -204,13 +178,9 @@ Rectangle {
                     }
                     onClicked: {
                         var a = root.items.slice();
-                        a[entry.index] = {
-                            type: "item",
-                            done: !entry.modelData.done,
-                            text: entry.modelData.text
-                        };
+                        a[entry.index] = { type: "item", done: !entry.modelData.done, text: entry.modelData.text };
                         root.items = a;
-                        saveTimer.restart();
+                        root._serialize();
                     }
                 }
             }
@@ -225,14 +195,14 @@ Rectangle {
             TextField {
                 id: inputField
                 Layout.fillWidth: true
-                placeholderText: "#group [task] or just type a task"
+                placeholderText: "#<group> [task] or [task]"
                 placeholderTextColor: Theme.txt2
                 color: Theme.txt1
                 font.pixelSize: 16
                 font.family: Theme.font
                 leftPadding: 8
                 background: Rectangle {
-                    color: "#252525"
+                    color: Theme.bgnd3
                     radius: 6
                 }
                 Keys.onReturnPressed: addBtn.add()
@@ -247,15 +217,13 @@ Rectangle {
 
                 function add() {
                     var t = inputField.text.trim();
-                    if (!t)
-                        return;
+                    if (!t) return;
                     var m = t.match(/^#(\S+)(?:\s+(.+))?$/);
                     if (m) {
                         var groupName = m[1];
                         var taskText = m[2] || null;
                         var a = root.items.slice();
 
-                        // Find existing group (case-insensitive)
                         var groupIdx = -1;
                         for (var i = 0; i < a.length; i++) {
                             if (a[i].type === "group" && a[i].text.toLowerCase() === groupName.toLowerCase()) {
@@ -264,40 +232,26 @@ Rectangle {
                             }
                         }
 
-                        // Create group at end if missing
                         if (groupIdx === -1) {
-                            a.push({
-                                type: "group",
-                                text: groupName
-                            });
+                            a.push({ type: "group", text: groupName });
                             groupIdx = a.length - 1;
                         }
 
                         if (taskText) {
-                            // Insert after the last item belonging to this group
                             var insertAt = groupIdx + 1;
                             while (insertAt < a.length && a[insertAt].type !== "group")
                                 insertAt++;
-                            a.splice(insertAt, 0, {
-                                type: "item",
-                                done: false,
-                                text: taskText
-                            });
+                            a.splice(insertAt, 0, { type: "item", done: false, text: taskText });
                         }
 
                         root.items = a;
                     } else {
-                        root.items = root.items.concat([
-                            {
-                                type: "item",
-                                done: false,
-                                text: t
-                            }
-                        ]);
+                        // Ungrouped tasks go to the top
+                        root.items = [{ type: "item", done: false, text: t }].concat(root.items);
                     }
 
                     inputField.text = "";
-                    saveTimer.restart();
+                    root._serialize();
                 }
 
                 Text {

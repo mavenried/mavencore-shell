@@ -39,31 +39,31 @@ Scope {
         function volume_up() {
             // wpctl get-volume @DEFAULT_SINK@ | awk '{print $2 * 100}'
             console.debug("Volume Up");
-            root.icons = ["󰝟", ["󰖀", "󰕾"]];
+            root.icons = [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]];
             // proc2.exec(["wpctl", "set-volume", "@DEFAULT_SINK@", "5%+"]);
             root.show_osd("wpctl set-volume --limit 1.0 @DEFAULT_SINK@ 5%+; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
         }
         function volume_down() {
             console.debug("Volume Down");
-            root.icons = ["󰝟", ["󰖀", "󰕾"]];
+            root.icons = [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]];
             // proc2.exec(["wpctl", "set-volume", "@DEFAULT_SINK@", "5%-"]);
             root.show_osd("wpctl set-volume @DEFAULT_SINK@ 5%-; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
         }
         function volume_mute() {
             console.debug("Volume Mute Toggle");
-            root.icons = ["󰝟", ["󰖀", "󰕾"]];
+            root.icons = [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]];
             // proc2.exec(["wpctl", "set-mute", "@DEFAULT_SINK@", "toggle"]);
             root.show_osd("wpctl set-mute @DEFAULT_SINK@ toggle; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
         }
         function brightness_up() {
             console.debug("Brightness Up");
-            root.icons = ["󰃞", ["󰃟", "󰃠"]];
+            root.icons = [String.fromCodePoint(0xF00DE), [String.fromCodePoint(0xF00DF), String.fromCodePoint(0xF00E0)]];
             // proc2.exec(["brightnessctl", "s", "+5%"]);
             root.show_osd("brightnessctl s +5% > /dev/null; brightnessctl -m | awk -F ',' '{gsub(/%/, \"\");print $4}'");
         }
         function brightness_down() {
             console.debug("Brightness Down");
-            root.icons = ["󰃞", ["󰃟", "󰃠"]];
+            root.icons = [String.fromCodePoint(0xF00DE), [String.fromCodePoint(0xF00DF), String.fromCodePoint(0xF00E0)]];
             // proc2.exec(["brightnessctl", "s", "5%-"]);
             root.show_osd("brightnessctl s 5%- > /dev/null; brightnessctl -m | awk -F ',' '{gsub(/%/, \"\");print $4}'");
         }

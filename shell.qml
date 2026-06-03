@@ -30,5 +30,7 @@ ShellRoot {
     Notifyd {}
     Launcher {}
     Osd {}
-    LockScreen {}
+    LockScreen {
+        blurPath: "/mnt/DATA/Pictures/CURRENT_BLUR"
+    }
 }

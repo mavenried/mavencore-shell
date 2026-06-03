@@ -26,6 +26,8 @@ Singleton {
     readonly property color bat4: "#f7ca88"
     readonly property color bat5: "#ab4642"
     readonly property color acct: "#141414"
+    readonly property color bgnd2: "#1c1c1c"
+    readonly property color bgnd3: "#2a2a2a"
 
     readonly property int radius: 15
     readonly property string font: "JetbrainsMonoNL Nerd Font"
