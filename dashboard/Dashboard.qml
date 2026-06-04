@@ -268,13 +268,13 @@ Scope {
 
                     RowLayout {
                         anchors.fill: parent
-                        spacing: 14
+                        spacing: 10
 
                         // ── Left: System ──────────────────────────────
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            spacing: 14
+                            spacing: 10
 
                             ClockWidget {
                                 Layout.fillWidth: true
@@ -291,7 +291,7 @@ Scope {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                             }
-                            ClockWidget {
+                            UptimeWidget {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 220
                             }
@@ -301,7 +301,7 @@ Scope {
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            spacing: 14
+                            spacing: 10
 
                             TodoWidget {
                                 Layout.fillWidth: true
@@ -314,7 +314,7 @@ Scope {
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            spacing: 14
+                            spacing: 10
                             ScratchpadWidget {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
@@ -325,7 +325,7 @@ Scope {
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            spacing: 14
+                            spacing: 10
 
                             CalendarWidget {
                                 Layout.fillWidth: true

@@ -35,9 +35,9 @@ WidgetCard {
 
         Text {
             Layout.alignment: Qt.AlignHCenter
-            text: String.fromCodePoint(0xF102) + " " + Uptime.text
-            color: Theme.uptm
-            font.pixelSize: 13
+            text: Qt.formatDate(clock.date, "yyyy")
+            color: Theme.txt2
+            font.pixelSize: 14
             font.family: Theme.font
             visible: Uptime.text !== ""
         }

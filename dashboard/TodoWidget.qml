@@ -104,13 +104,13 @@ WidgetCard {
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Theme.sptr
+                        color: Theme.mmry
                         opacity: 0.6
                         Layout.alignment: Qt.AlignVCenter
                     }
                     Text {
                         text: String.fromCodePoint(0xD7)
-                        color: Theme.sptr
+                        color: Theme.acct
                         font.pixelSize: 13
                         font.family: Theme.font
                         MouseArea {
@@ -145,7 +145,7 @@ WidgetCard {
                         radius: 4
                         Layout.alignment: Qt.AlignTop
                         color: entry.modelData.done ? Theme.pfle : "transparent"
-                        border.color: entry.modelData.done ? Theme.pfle : Theme.sptr
+                        border.color: entry.modelData.done ? Theme.pfle : Theme.acct
                         border.width: 1
                         Text {
                             anchors.centerIn: parent
@@ -168,7 +168,7 @@ WidgetCard {
 
                     Text {
                         text: String.fromCodePoint(0xD7)
-                        color: Theme.sptr
+                        color: Theme.acct
                         font.pixelSize: 16
                         font.family: Theme.font
                         Layout.alignment: Qt.AlignTop
@@ -225,7 +225,7 @@ WidgetCard {
                 background: Rectangle {
                     color: Theme.bgnd
                     radius: 6
-                    border.color: Theme.sptr
+                    border.color: Theme.acct
                 }
                 Keys.onReturnPressed: addBtn.add()
             }
