@@ -52,7 +52,7 @@ WidgetCard {
         Text {
             text: "Network"
             color: Theme.txt1
-            font.pixelSize: 15
+            font.pixelSize: 20
             font.bold: true
             font.family: Theme.font
         }

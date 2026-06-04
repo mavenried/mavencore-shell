@@ -73,15 +73,6 @@ readonly property color  bgnd: "#141414"   // base background
 // ...
 ```
 
-### Hardcoded paths in LockSurface
-
-Two paths are still hardcoded in `lockscreen/LockSurface.qml` and need manual editing if your setup differs:
-
-```qml
-command: ["/mnt/DATA/scripts/battery"]        // L41 — battery script for lock screen
-source:  "file:///mnt/DATA/Pictures/AVATAR"   // L172 — avatar image
-```
-
 ## IPC
 
 All modules are toggled via `qs ipc call`:

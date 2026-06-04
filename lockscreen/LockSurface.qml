@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Io
 import Quickshell.Widgets
 import QtQuick
 import qs
@@ -9,6 +8,7 @@ Item {
 
     required property var context
     property string blurPath: ""
+    property string avatarPath: ""
 
     property string fpState: "idle"
     property bool pwFailed: false
@@ -16,7 +16,7 @@ Item {
 
     property string currentHour: Qt.formatTime(new Date(), "hh")
     property string currentMinute: Qt.formatTime(new Date(), "mm")
-    property string batteryText: ""
+    readonly property string batteryText: BatteryStats.icon + " " + BatteryStats.level.toFixed(0) + "%"
 
     Timer {
         interval: 1000
@@ -25,21 +25,6 @@ Item {
         onTriggered: {
             root.currentHour = Qt.formatTime(new Date(), "hh");
             root.currentMinute = Qt.formatTime(new Date(), "mm");
-        }
-    }
-
-    Timer {
-        interval: 5000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: batteryProc.running = true
-    }
-    Process {
-        id: batteryProc
-        command: ["/mnt/DATA/scripts/battery"]
-        stdout: SplitParser {
-            onRead: data => root.batteryText = data.trim()
         }
     }
 
@@ -168,14 +153,14 @@ Item {
             border.width: 2
             Image {
                 anchors.fill: parent
-                source: "file:///mnt/DATA/Pictures/AVATAR"
+                source: root.avatarPath ? "file://" + root.avatarPath : ""
             }
         }
 
         Text {
             x: 500 - implicitWidth / 2
             y: -200 - implicitHeight / 2
-            text: Uptime.text
+            text: String.fromCodePoint(0xF102) + " " + Uptime.text
             font {
                 pointSize: 25
                 family: "JetBrains Mono Nerd Font"

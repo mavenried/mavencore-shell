@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell.Io
 import qs
 
 Rectangle {
@@ -31,12 +30,10 @@ Rectangle {
             drawBox: false
         }
 
-        CommandMonitor {
+        Module {
+            label: String.fromCodePoint(0xF02CA) + " " + ((SysStats.diskValues[root.diskPath] ?? 0) * 100).toFixed(0).padStart(3, " ") + "%"
             labelColor: Theme.disk
             drawBox: false
-            label: String.fromCodePoint(0xF02CA) + " ---%"
-            template: String.fromCodePoint(0xF02CA) + " %3s%"
-            command: ["mavencore", "disk", root.diskPath]
         }
 
         Module {

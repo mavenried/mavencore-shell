@@ -223,8 +223,9 @@ WidgetCard {
                 font.family: Theme.font
                 leftPadding: 8
                 background: Rectangle {
-                    color: Theme.bgnd3
+                    color: Theme.bgnd
                     radius: 6
+                    border.color: Theme.sptr
                 }
                 Keys.onReturnPressed: addBtn.add()
             }

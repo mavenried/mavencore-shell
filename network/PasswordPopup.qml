@@ -26,7 +26,7 @@ Item {
             width: 340
             height: form.implicitHeight + 40
             radius: Theme.radius
-            color: Theme.bgnd2
+            color: Theme.bgnd
             border.color: Theme.mmry
             border.width: 2
 

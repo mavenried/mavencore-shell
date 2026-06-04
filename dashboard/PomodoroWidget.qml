@@ -46,100 +46,107 @@ WidgetCard {
         return m.toString().padStart(2, "0") + ":" + (s % 60).toString().padStart(2, "0");
     }
 
-    ColumnLayout {
+    RowLayout {
         anchors.fill: parent
-        anchors.margins: 14
-        spacing: 10
+        anchors.margins: 20
+        spacing: 16
 
-        // Progress ring + overlay text
-        Item {
-            Layout.alignment: Qt.AlignHCenter
-            implicitWidth: 130
-            implicitHeight: 130
-
-            Canvas {
-                id: arc
-                anchors.fill: parent
-
-                readonly property real progress: root.totalSeconds > 0 ? root.secondsLeft / root.totalSeconds : 1.0
-                property string phase: root.phase
-
-                onProgressChanged: requestPaint()
-                onPhaseChanged: requestPaint()
-                onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.reset();
-                    var cx = width / 2, cy = height / 2, r = cx - 9;
-                    var start = -Math.PI / 2;
-
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-                    ctx.strokeStyle = Theme.bgnd3.toString();
-                    ctx.lineWidth = 8;
-                    ctx.stroke();
-
-                    if (progress > 0.001) {
-                        ctx.beginPath();
-                        ctx.arc(cx, cy, r, start, start + progress * 2 * Math.PI);
-                        ctx.strokeStyle = root.phaseColor;
-                        ctx.lineWidth = 8;
-                        ctx.lineCap = "round";
-                        ctx.stroke();
-                    }
-                }
-
-                Component.onCompleted: requestPaint()
-            }
-
-            ColumnLayout {
-                anchors.centerIn: parent
-                spacing: 2
-
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: root.fmtTime(root.secondsLeft)
-                    color: Theme.txt1
-                    font.pixelSize: 24
-                    font.bold: true
-                    font.family: Theme.font
-                }
-
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: root.phaseLabel
-                    color: root.phaseColor
-                    font.pixelSize: 10
-                    font.family: Theme.font
-                }
-            }
-        }
-
-        // Session dots — filled = completed sessions in current set of 4
-        Row {
-            Layout.alignment: Qt.AlignHCenter
+        // Left: progress ring + session dots
+        ColumnLayout {
+            Layout.alignment: Qt.AlignVCenter
             spacing: 8
-            Repeater {
-                model: 4
-                Rectangle {
-                    required property int index
-                    width: 8
-                    height: 8
-                    radius: 4
-                    color: {
-                        if (root.phase === "longBreak")
-                            return root.phaseColor;
-                        return (root.sessions % 4) > index ? root.phaseColor : Theme.bgnd3;
+            Item {
+                Layout.fillWidth: parent
+            }
+            Item {
+                Layout.alignment: Qt.AlignHCenter
+                implicitWidth: 180
+                implicitHeight: 180
+
+                Canvas {
+                    id: arc
+                    anchors.fill: parent
+
+                    readonly property real progress: root.totalSeconds > 0 ? root.secondsLeft / root.totalSeconds : 1.0
+                    property string phase: root.phase
+
+                    onProgressChanged: requestPaint()
+                    onPhaseChanged: requestPaint()
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        ctx.reset();
+                        var cx = width / 2, cy = height / 2, r = cx - 9;
+                        var start = -Math.PI / 2;
+
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+                        ctx.strokeStyle = Qt.rgba(0, 0, 0, 0.2).toString();
+                        ctx.lineWidth = 8;
+                        ctx.stroke();
+
+                        if (progress > 0.001) {
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, r, start, start + progress * 2 * Math.PI);
+                            ctx.strokeStyle = root.phaseColor;
+                            ctx.lineWidth = 8;
+                            ctx.lineCap = "round";
+                            ctx.stroke();
+                        }
+                    }
+
+                    Component.onCompleted: requestPaint()
+                }
+
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: 2
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: root.fmtTime(root.secondsLeft)
+                        color: Theme.txt1
+                        font.pixelSize: 24
+                        font.bold: true
+                        font.family: Theme.font
+                    }
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: root.phaseLabel
+                        color: root.phaseColor
+                        font.pixelSize: 10
+                        font.family: Theme.font
+                    }
+                }
+            }
+
+            Row {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 8
+                Repeater {
+                    model: 4
+                    Rectangle {
+                        required property int index
+                        width: 8
+                        height: 8
+                        radius: 4
+                        color: {
+                            if (root.phase === "longBreak")
+                                return root.phaseColor;
+                            return (root.sessions % 4) > index ? root.phaseColor : Qt.rgba(0, 0, 0, 0.2);
+                        }
                     }
                 }
             }
         }
 
-        // Controls
-        RowLayout {
-            Layout.alignment: Qt.AlignHCenter
-            spacing: 24
+        // Right: controls stacked vertically
+        ColumnLayout {
+            Layout.alignment: Qt.AlignVCenter
+            spacing: 20
 
             Text {
+                Layout.alignment: Qt.AlignHCenter
                 text: root.iconReset
                 color: Theme.txt2
                 font.pixelSize: 16
@@ -153,6 +160,7 @@ WidgetCard {
             }
 
             Text {
+                Layout.alignment: Qt.AlignHCenter
                 text: (root.phase === "idle" || root.paused) ? root.iconPlay : root.iconPause
                 color: root.phaseColor
                 font.pixelSize: 22
@@ -166,6 +174,7 @@ WidgetCard {
             }
 
             Text {
+                Layout.alignment: Qt.AlignHCenter
                 text: root.iconSkip
                 color: Theme.txt2
                 font.pixelSize: 16
@@ -178,9 +187,8 @@ WidgetCard {
                 }
             }
         }
-
         Item {
-            Layout.fillHeight: true
+            Layout.fillWidth: parent
         }
     }
 }

@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import qs
 import qs.bar
 import qs.notifyd
 import qs.launcher
@@ -10,13 +11,23 @@ import qs.lockscreen
 import qs.dashboard
 
 ShellRoot {
-
+    // Change Conf Singleton options
+    Binding {
+        target: Conf
+        property: "batteryPath"
+        value: "/sys/class/power_supply/BAT1"
+    }
     Wallpaper {
         wallpaperPath: "/mnt/DATA/Pictures/CURRENT"
         showTime: true
     }
+    Binding {
+        target: Conf
+        property: "diskPaths"
+        value: ["/", "/mnt/DATA"]
+    }
+
     Dashboard {
-        diskPaths: ["/", "/mnt/DATA"]
         scratchpadPath: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
         todoPath: "/mnt/DATA/Documents/scratches/.mavencore-todo"
         networkIface: "wlan0"
@@ -24,7 +35,6 @@ ShellRoot {
     }
     NetworkManager {}
     Bar {
-        batteryPath: "/sys/class/power_supply/BAT1"
         showBattery: true
         showPower: true
         diskPath: "/mnt/DATA"
@@ -34,5 +44,6 @@ ShellRoot {
     Osd {}
     LockScreen {
         blurPath: "/mnt/DATA/Pictures/CURRENT_BLUR"
+        avatarPath: "/mnt/DATA/Pictures/AVATAR"
     }
 }

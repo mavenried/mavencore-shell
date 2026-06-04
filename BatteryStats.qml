@@ -6,7 +6,6 @@ import qs
 
 Singleton {
     id: root
-    property string batteryPath: "/sys/class/power_supply/BAT1"
     property real level: 0
     property real watts: 0
     property string icon: String.fromCodePoint(0xF007E)
@@ -25,7 +24,7 @@ Singleton {
 
     Process {
         id: levelProc
-        command: ["mavencore", "battery", root.batteryPath]
+        command: ["mavencore", "battery", Conf.batteryPath]
         stdout: StdioCollector {
             onStreamFinished: root.level = parseFloat(this.text.trim()) || 0
         }
@@ -33,7 +32,7 @@ Singleton {
 
     Process {
         id: powerProc
-        command: ["mavencore", "power", root.batteryPath]
+        command: ["mavencore", "power", Conf.batteryPath]
         stdout: StdioCollector {
             onStreamFinished: root.watts = parseFloat(this.text.trim()) || 0
         }
@@ -41,7 +40,7 @@ Singleton {
 
     Process {
         id: iconProc
-        command: ["mavencore", "battery-icon", root.batteryPath]
+        command: ["mavencore", "battery-icon", Conf.batteryPath]
         stdout: StdioCollector {
             onStreamFinished: root.icon = this.text.trim()
         }

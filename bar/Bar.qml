@@ -4,16 +4,9 @@ import qs
 
 Scope {
     id: scope
-    property string batteryPath
     required property string diskPath
     property bool showBattery: true
     property bool showPower: true
-
-    Binding {
-        target: BatteryStats
-        property: "batteryPath"
-        value: scope.batteryPath
-    }
 
     Variants {
         model: Quickshell.screens
@@ -110,7 +103,7 @@ Scope {
 
                 CommandMonitor {
                     labelColor: Theme.wifi
-                    command: ["zsh", "-c", "~/.config/quickshell/scripts/qs-online"]
+                    command: ["mavencore", "online"]
                     label: String.fromCodePoint(0xF059F) + " offline"
 
                     onclick: ["qs", "ipc", "call", "network-manager", "toggle"]

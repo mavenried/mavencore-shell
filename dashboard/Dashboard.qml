@@ -9,7 +9,6 @@ import qs
 Scope {
     id: root
 
-    property list<string> diskPaths: ["/"]
     property string weatherLocation: ""
     property string scratchpadPath: ""
     property string todoPath: ""
@@ -141,6 +140,43 @@ Scope {
         }
     }
 
+    // ── Media cache (outside LazyLoader — persists across open/close) ────────
+    property string mediaArtist: ""
+    property string mediaTitle: "Nothing playing"
+    property string mediaStatus: "Stopped"
+    property string mediaArtUrl: ""
+    property real mediaPositionUs: 0
+    property real mediaLengthUs: 0
+
+    Timer {
+        interval: 1000
+        running: root.mediaStatus === "Playing" && root.mediaLengthUs > 0
+        repeat: true
+        onTriggered: root.mediaPositionUs = Math.min(root.mediaPositionUs + 1000000, root.mediaLengthUs)
+    }
+
+    PolledProcess {
+        command: ["playerctl", "metadata", "--format", "{{artist}}|{{title}}|{{status}}|{{mpris:length}}|{{position}}|{{mpris:artUrl}}"]
+        interval: 3000
+        onReceived: function (data) {
+            var parts = data.split("|");
+            if (parts.length < 5 || !parts[1]) {
+                root.mediaTitle = "Nothing playing";
+                root.mediaArtist = "";
+                root.mediaStatus = "Stopped";
+                root.mediaLengthUs = 0;
+                root.mediaArtUrl = "";
+                return;
+            }
+            root.mediaArtist = parts[0];
+            root.mediaTitle = parts[1];
+            root.mediaStatus = parts[2];
+            root.mediaLengthUs = parseFloat(parts[3]) || 0;
+            root.mediaPositionUs = parseFloat(parts[4]) || 0;
+            root.mediaArtUrl = parts[5] || "";
+        }
+    }
+
     // ── IPC / lifecycle ──────────────────────────────────────────────────────
     OverlayToggle {
         id: ot
@@ -254,7 +290,10 @@ Scope {
                             StatsWidget {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                diskPaths: root.diskPaths
+                            }
+                            ClockWidget {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 220
                             }
                         }
 
@@ -290,7 +329,7 @@ Scope {
 
                             CalendarWidget {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 260
+                                Layout.preferredHeight: 220
                             }
 
                             WeatherWidget {
@@ -307,7 +346,13 @@ Scope {
 
                             MediaWidget {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 170
+                                Layout.preferredHeight: 200
+                                artist: root.mediaArtist
+                                title: root.mediaTitle
+                                status: root.mediaStatus
+                                artUrl: root.mediaArtUrl
+                                positionUs: root.mediaPositionUs
+                                lengthUs: root.mediaLengthUs
                             }
 
                             PomodoroWidget {

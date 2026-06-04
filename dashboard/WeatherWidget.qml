@@ -16,8 +16,9 @@ WidgetCard {
     property string icon: String.fromCodePoint(0x1F321)
 
     ColumnLayout {
-        anchors.fill: parent
+        anchors.centerIn: parent
         anchors.margins: 18
+
         spacing: 6
 
         Text {

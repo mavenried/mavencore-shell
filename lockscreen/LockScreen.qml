@@ -7,6 +7,7 @@ import QtQuick
 Scope {
     id: lockScreen
     property string blurPath: ""
+    property string avatarPath: ""
 
     LockContext {
         id: lockContext
@@ -32,6 +33,7 @@ Scope {
                 anchors.fill: parent
                 context: lockContext
                 blurPath: lockScreen.blurPath
+                avatarPath: lockScreen.avatarPath
             }
         }
     }

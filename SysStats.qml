@@ -7,6 +7,7 @@ Singleton {
     id: root
     property real cpu: 0
     property real ram: 0
+    property var diskValues: ({})
 
     Process {
         id: cpuProc
@@ -24,6 +25,23 @@ Singleton {
         }
     }
 
+    Process {
+        id: diskProc
+        command: ["sh", "-c", Conf.diskPaths.map(p => "mavencore disk '" + p + "'").join(";")]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var lines = this.text.trim().split("\n").filter(l => l.trim());
+                var vals = {};
+                for (var i = 0; i < lines.length && i < Conf.diskPaths.length; i++) {
+                    var v = parseFloat(lines[i].trim());
+                    if (!isNaN(v))
+                        vals[Conf.diskPaths[i]] = v / 100;
+                }
+                root.diskValues = vals;
+            }
+        }
+    }
+
     Timer {
         interval: 2000
         running: true
@@ -34,6 +52,8 @@ Singleton {
             cpuProc.running = true;
             ramProc.running = false;
             ramProc.running = true;
+            diskProc.running = false;
+            diskProc.running = true;
         }
     }
 }

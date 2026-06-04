@@ -6,27 +6,9 @@ import qs
 WidgetCard {
     id: root
 
-    property list<string> diskPaths: ["/"]
-    property var diskValues: ({})
-
     readonly property string iconCpu: String.fromCodePoint(0xF4BC)
     readonly property string iconRam: String.fromCodePoint(0xEFC5)
     readonly property string iconDisk: String.fromCodePoint(0xF02CA)
-
-    PolledProcess {
-        command: ["sh", "-c", root.diskPaths.map(p => "mavencore disk '" + p + "'").join(";")]
-        interval: 2000
-        onReceived: function (data) {
-            var lines = data.split("\n").filter(l => l.trim());
-            var vals = {};
-            for (var i = 0; i < lines.length && i < root.diskPaths.length; i++) {
-                var v = parseFloat(lines[i].trim());
-                if (!isNaN(v))
-                    vals[root.diskPaths[i]] = v / 100;
-            }
-            root.diskValues = vals;
-        }
-    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -36,7 +18,7 @@ WidgetCard {
         Text {
             text: "System"
             color: Theme.txt1
-            font.pixelSize: 15
+            font.pixelSize: 20
             font.bold: true
             font.family: Theme.font
         }
@@ -53,11 +35,11 @@ WidgetCard {
         }
 
         Repeater {
-            model: root.diskPaths
+            model: Conf.diskPaths
             delegate: StatBar {
                 required property string modelData
                 label: root.iconDisk + " " + (modelData === "/" ? "ROOT" : modelData.split("/").filter(Boolean).pop().toUpperCase())
-                pct: root.diskValues[modelData] ?? 0
+                pct: SysStats.diskValues[modelData] ?? 0
                 barColor: Theme.disk
             }
         }
@@ -114,13 +96,19 @@ WidgetCard {
             Layout.fillWidth: true
             height: 6
             radius: 3
-            color: Theme.bgnd3
+            color: Qt.rgba(0, 0, 0, 0.2)
             Rectangle {
+                id: fillBar
                 width: parent.width * sb.pct
                 height: parent.height
                 radius: parent.radius
                 color: sb.barColor
+                property bool _ready: false
+                Component.onCompleted: Qt.callLater(function () {
+                    _ready = true;
+                })
                 Behavior on width {
+                    enabled: fillBar._ready
                     NumberAnimation {
                         duration: 600
                         easing.type: Easing.OutCubic
