@@ -91,7 +91,7 @@ WidgetCard {
                     }
                     anchors.top: parent.top
                     anchors.topMargin: entry.index > 0 ? 12 : 0
-                    spacing: 8
+                    spacing: 10
 
                     Text {
                         text: entry.modelData.text.toUpperCase()
@@ -137,19 +137,19 @@ WidgetCard {
                     }
                     anchors.leftMargin: 2
                     anchors.rightMargin: 2
-                    spacing: 8
+                    spacing: 10
 
                     Rectangle {
-                        width: 16
-                        height: 16
+                        width: 20
+                        height: 20
                         radius: 4
                         Layout.alignment: Qt.AlignTop
                         color: entry.modelData.done ? Theme.pfle : "transparent"
-                        border.color: entry.modelData.done ? Theme.pfle : Theme.acct
-                        border.width: 1
+                        border.color: entry.modelData.done ? Theme.pfle : Qt.rgba(1, 1, 1, 0.2)
+                        border.width: 2
                         Text {
                             anchors.centerIn: parent
-                            text: String.fromCodePoint(0x2713)
+                            text: String.fromCodePoint(0x00d7)
                             color: Theme.bgnd
                             font.pixelSize: 12
                             visible: entry.modelData.done
@@ -211,7 +211,7 @@ WidgetCard {
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 8
+            spacing: 10
 
             TextField {
                 id: inputField
@@ -219,13 +219,12 @@ WidgetCard {
                 placeholderText: "#<group> [task] or [task]"
                 placeholderTextColor: Theme.txt2
                 color: Theme.txt1
-                font.pixelSize: 16
+                font.pixelSize: 20
                 font.family: Theme.font
                 leftPadding: 8
                 background: Rectangle {
-                    color: Theme.bgnd
                     radius: 6
-                    border.color: Theme.acct
+                    color: Qt.rgba(0, 0, 0, 0.2)
                 }
                 Keys.onReturnPressed: addBtn.add()
             }

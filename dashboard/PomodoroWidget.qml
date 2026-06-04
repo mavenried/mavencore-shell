@@ -114,7 +114,7 @@ WidgetCard {
                         Layout.alignment: Qt.AlignHCenter
                         text: root.phaseLabel
                         color: root.phaseColor
-                        font.pixelSize: 10
+                        font.pixelSize: 18
                         font.family: Theme.font
                     }
                 }
