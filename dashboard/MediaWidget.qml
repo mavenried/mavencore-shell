@@ -28,7 +28,7 @@ WidgetCard {
     readonly property string iconPrev: String.fromCodePoint(0xF048)
     readonly property string iconPlay: String.fromCodePoint(0xF04B)
     readonly property string iconPause: String.fromCodePoint(0xF04C)
-    readonly property string iconNext: String.fromCodePoint(0xF050)
+    readonly property string iconNext: String.fromCodePoint(0xF051)
 
     function fmt(us) {
         var s = Math.floor(us / 1000000);
