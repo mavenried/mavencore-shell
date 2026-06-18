@@ -21,6 +21,11 @@ Item {
         saveTimer.restart();
     }
 
+    Component.onDestruction: {
+        if (saveTimer.running)
+            fv.setText(root.pending);
+    }
+
     FileView {
         id: fv
         path: root.path
