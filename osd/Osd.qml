@@ -4,12 +4,13 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Services.Pipewire
 import qs
 
 Scope {
     id: root
     property bool showing: false
-    property var icons
+    property var icons: [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]]
     property string icon: {
         if (pct == 0)
             return root.icons[0];
@@ -21,50 +22,84 @@ Scope {
     }
     property int pct: 0
 
-    function show_osd(command) {
+    readonly property real volumeStep: 0.05
+
+    function reveal() {
         loader.active = true;
-        proc.command = ["sh", "-c", command];
-
-        proc.running = false;
-        proc.running = true;
-
         root.showing = true;
 
         tmr.running = false;
         tmr.running = true;
     }
 
+    function show_osd(command) {
+        root.reveal();
+        proc.command = ["sh", "-c", command];
+
+        proc.running = false;
+        proc.running = true;
+    }
+
+    function updateVolumePct() {
+        const sink = Pipewire.defaultAudioSink;
+        if (!sink || !sink.ready || !sink.audio) {
+            root.pct = 0;
+            return;
+        }
+        root.pct = sink.audio.muted ? 0 : Math.round(sink.audio.volume * 100);
+    }
+
+    PwObjectTracker {
+        objects: [Pipewire.defaultAudioSink]
+    }
+
+    Connections {
+        target: Pipewire.defaultAudioSink ? Pipewire.defaultAudioSink.audio : null
+        function onMutedChanged() {
+            root.updateVolumePct();
+        }
+        function onVolumesChanged() {
+            root.updateVolumePct();
+        }
+    }
+
     IpcHandler {
         target: "osd"
         function volume_up() {
-            // wpctl get-volume @DEFAULT_SINK@ | awk '{print $2 * 100}'
             console.debug("Volume Up");
             root.icons = [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]];
-            // proc2.exec(["wpctl", "set-volume", "@DEFAULT_SINK@", "5%+"]);
-            root.show_osd("wpctl set-volume --limit 1.0 @DEFAULT_SINK@ 5%+; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
+            const sink = Pipewire.defaultAudioSink;
+            if (sink && sink.ready && sink.audio)
+                sink.audio.volume = Math.min(1.0, sink.audio.volume + root.volumeStep);
+            root.updateVolumePct();
+            root.reveal();
         }
         function volume_down() {
             console.debug("Volume Down");
             root.icons = [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]];
-            // proc2.exec(["wpctl", "set-volume", "@DEFAULT_SINK@", "5%-"]);
-            root.show_osd("wpctl set-volume @DEFAULT_SINK@ 5%-; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
+            const sink = Pipewire.defaultAudioSink;
+            if (sink && sink.ready && sink.audio)
+                sink.audio.volume = Math.max(0.0, sink.audio.volume - root.volumeStep);
+            root.updateVolumePct();
+            root.reveal();
         }
         function volume_mute() {
             console.debug("Volume Mute Toggle");
             root.icons = [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]];
-            // proc2.exec(["wpctl", "set-mute", "@DEFAULT_SINK@", "toggle"]);
-            root.show_osd("wpctl set-mute @DEFAULT_SINK@ toggle; wpctl get-volume @DEFAULT_SINK@ | awk '/MUTED/ {print 0; next} {print $2 * 100}'");
+            const sink = Pipewire.defaultAudioSink;
+            if (sink && sink.ready && sink.audio)
+                sink.audio.muted = !sink.audio.muted;
+            root.updateVolumePct();
+            root.reveal();
         }
         function brightness_up() {
             console.debug("Brightness Up");
             root.icons = [String.fromCodePoint(0xF00DE), [String.fromCodePoint(0xF00DF), String.fromCodePoint(0xF00E0)]];
-            // proc2.exec(["brightnessctl", "s", "+5%"]);
             root.show_osd("brightnessctl s +5% > /dev/null; brightnessctl -m | awk -F ',' '{gsub(/%/, \"\");print $4}'");
         }
         function brightness_down() {
             console.debug("Brightness Down");
             root.icons = [String.fromCodePoint(0xF00DE), [String.fromCodePoint(0xF00DF), String.fromCodePoint(0xF00E0)]];
-            // proc2.exec(["brightnessctl", "s", "5%-"]);
             root.show_osd("brightnessctl s 5%- > /dev/null; brightnessctl -m | awk -F ',' '{gsub(/%/, \"\");print $4}'");
         }
     }
@@ -79,12 +114,6 @@ Scope {
                 root.pct = parseInt(this.text);
             }
         }
-    }
-
-    Process {
-        id: proc2
-        running: false
-        command: []
     }
 
     Timer {

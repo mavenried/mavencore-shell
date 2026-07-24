@@ -9,6 +9,7 @@ import qs.osd
 import qs.wallpaper
 import qs.lockscreen
 import qs.dashboard
+import qs.polkit
 
 ShellRoot {
     // Change Conf Singleton options
@@ -46,4 +47,5 @@ ShellRoot {
         blurPath: "/mnt/DATA/Pictures/CURRENT_BLUR"
         avatarPath: "/mnt/DATA/Pictures/AVATAR"
     }
+    Polkit {}
 }

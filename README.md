@@ -15,7 +15,6 @@ A Wayland shell built with <a href="https://quickshell.outfoxxed.me">Quickshell<
 | `qalc`                                                   | Calculator mode in launcher                           |
 | `ghostty`                                                | Terminal opened for system upgrades                   |
 | `brightnessctl`                                          | Brightness OSD                                        |
-| `wpctl`                                                  | Volume OSD (PipeWire)                                 |
 | A [Nerd Font](https://www.nerdfonts.com/)                | All icons — configured in `Theme.qml`                 |
 
 ## Installation
