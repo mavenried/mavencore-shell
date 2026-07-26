@@ -26,6 +26,7 @@ ShellRoot {
                 blurPath: "/mnt/DATA/Pictures/CURRENT_BLUR"
                 avatarPath: "/mnt/DATA/Pictures/AVATAR"
                 lastUserPath: "/var/lib/greetd/.quickshell-last-user"
+                lastSessionPath: "/var/lib/greetd/.quickshell-last-session"
                 defaultUser: "mavenried"
             }
         }

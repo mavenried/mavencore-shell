@@ -11,9 +11,11 @@ Item {
     property string blurPath: ""
     property string avatarPath: ""
     property string lastUserPath: ""
+    property string lastSessionPath: ""
     property string defaultUser: ""
+    property bool _sessionSelected: false
 
-    property string step: "connecting" // connecting | prompt | launching
+    property string step: "connecting"
     property string promptLabel: "Connecting…"
     property bool promptEcho: false
     property bool respFailed: false
@@ -48,9 +50,26 @@ Item {
         }
     }
 
+    Loader {
+        id: lastSessionLoader
+        active: root.lastSessionPath.length > 0
+        sourceComponent: PersistentFile {
+            path: root.lastSessionPath
+        }
+    }
+
     function _preferredUsername() {
         const saved = lastUserLoader.item ? lastUserLoader.item.read().trim() : "";
         return saved.length ? saved : root.defaultUser;
+    }
+
+    function _maybeSelectSession() {
+        if (root._sessionSelected || !Sessions.sessions.length)
+            return;
+        root._sessionSelected = true;
+        const preferred = lastSessionLoader.item ? lastSessionLoader.item.read().trim() : "";
+        if (preferred)
+            Sessions.selectByName(preferred);
     }
 
     function _maybeStartAuth() {
@@ -82,12 +101,22 @@ Item {
         root._startAuth();
     }
 
-    Component.onCompleted: root._maybeStartAuth()
+    Component.onCompleted: {
+        root._maybeSelectSession();
+        root._maybeStartAuth();
+    }
 
     Connections {
         target: Users
         function onUsersChanged() {
             root._maybeStartAuth();
+        }
+    }
+
+    Connections {
+        target: Sessions
+        function onSessionsChanged() {
+            root._maybeSelectSession();
         }
     }
 
@@ -116,6 +145,8 @@ Item {
             const s = Sessions.current;
             if (lastUserLoader.item)
                 lastUserLoader.item.save(Greetd.user);
+            if (lastSessionLoader.item && s)
+                lastSessionLoader.item.save(s.name);
             Greetd.launch(["sh", "-c", s ? s.exec : "$SHELL -l"], [`XDG_SESSION_TYPE=${s ? s.type : "wayland"}`], true);
         }
 
@@ -155,14 +186,21 @@ Item {
         command: ["systemctl", "reboot"]
     }
 
+    Process {
+        id: hibernateProc
+        command: ["systemctl", "hibernate"]
+    }
+
     function _powerTap(action) {
         if (root.powerArmed && root.powerAction === action) {
             powerDisarm.stop();
             root.powerArmed = false;
             if (action === "poweroff")
                 poweroffProc.running = true;
-            else
+            else if (action === "reboot")
                 rebootProc.running = true;
+            else if (action === "hibernate")
+                hibernateProc.running = true;
         } else {
             root.powerAction = action;
             root.powerArmed = true;
@@ -190,325 +228,283 @@ Item {
         visible: true
     }
 
+    Rectangle {
+        anchors.fill: parent
+        color: "#66000000"
+    }
+
     Item {
-        id: centreAnchor
-        anchors.centerIn: parent
-        width: 0
-        height: 0
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: parent.height / 2 - 460
+        width: clockText.implicitWidth
+        height: clockText.implicitHeight + dateText.implicitHeight + 4
 
-        Rectangle {
-            x: -500 - 300
-            y: -400
-            width: 600
-            height: 800
-            radius: 90
-            color: Theme.bgnd
-            border.color: Theme.acct
-            border.width: 2
-        }
         Text {
-            x: -500 - implicitWidth / 2
-            y: -150 - implicitHeight / 2
-            text: root.currentHour
+            id: clockText
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: root.currentHour + ":" + root.currentMinute
             font {
-                pointSize: 250
+                pointSize: 72
                 family: Theme.font
             }
             renderType: Text.CurveRendering
-            color: Theme.mmry
+            color: Theme.txt1
         }
-
         Text {
-            x: -500 - implicitWidth / 2
-            y: 150 - implicitHeight / 2
-            text: root.currentMinute
-            font {
-                pointSize: 250
-                family: Theme.font
+            id: dateText
+            anchors {
+                top: clockText.bottom
+                topMargin: 4
+                horizontalCenter: parent.horizontalCenter
             }
-            renderType: Text.CurveRendering
-            color: Theme.cpuc
-        }
-
-        Rectangle {
-            x: 500 - 200
-            y: -300
-            width: 400
-            height: 600
-            radius: 90
-            color: Theme.bgnd
-            border.color: Theme.acct
-            border.width: 2
-        }
-
-        ClippingRectangle {
-            x: 500 - 70
-            y: -150 - 70
-            width: 140
-            height: 140
-            radius: 70
-            color: "transparent"
-            border.color: Theme.bgnd
-            border.width: 2
-            Image {
-                anchors.fill: parent
-                source: root.avatarPath ? "file://" + root.avatarPath : ""
-                visible: root.avatarPath.length > 0
-            }
-            Text {
-                anchors.centerIn: parent
-                visible: root.avatarPath.length === 0
-                text: String.fromCodePoint(0xF007)
-                font {
-                    pointSize: 52
-                    family: Theme.font
-                }
-                color: Theme.txt2
-            }
-        }
-
-        Text {
-            x: 500 - implicitWidth / 2
-            y: -60 - implicitHeight / 2
             text: root.currentDate
             font {
-                pointSize: 13
+                pointSize: 14
                 family: Theme.font
             }
             color: Theme.txt2
         }
+    }
 
-        // username switcher
-        Row {
-            x: 500 - implicitWidth / 2
-            y: -25 - implicitHeight / 2
-            spacing: 10
+    Rectangle {
+        id: card
+        anchors.centerIn: parent
+        width: 360
+        height: cardCol.implicitHeight + 100
+        radius: Theme.radius * 2
+        color: Theme.bgnd
+        border.color: Theme.acct
+        border.width: 2
 
-            Text {
-                text: String.fromCodePoint(0xF053)
-                font {
-                    pointSize: 16
-                    family: Theme.font
-                }
-                color: Theme.txt2
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -8
-                    onClicked: root._changeUser(-1)
-                }
+        Column {
+            id: cardCol
+            anchors {
+                top: parent.top
+                horizontalCenter: parent.horizontalCenter
+                topMargin: 50
             }
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 260
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
-                text: Users.current || "No user found"
-                font {
-                    pointSize: 14
-                    family: Theme.font
-                }
-                color: Theme.txt1
-            }
-            Text {
-                text: String.fromCodePoint(0xF054)
-                font {
-                    pointSize: 16
-                    family: Theme.font
-                }
-                color: Theme.txt2
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -8
-                    onClicked: root._changeUser(1)
-                }
-            }
-        }
+            width: parent.width - 60
+            spacing: 22
 
-        // session switcher
-        Row {
-            x: 500 - implicitWidth / 2
-            y: 10 - implicitHeight / 2
-            spacing: 10
+            Item {
+                width: parent.width
+                height: 140
 
-            Text {
-                text: String.fromCodePoint(0xF053)
-                font {
-                    pointSize: 16
-                    family: Theme.font
-                }
-                color: Theme.txt2
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -8
-                    onClicked: Sessions.prev()
-                }
-            }
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 260
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
-                text: Sessions.current ? Sessions.current.name : "No session found"
-                font {
-                    pointSize: 14
-                    family: Theme.font
-                }
-                color: Theme.txt1
-            }
-            Text {
-                text: String.fromCodePoint(0xF054)
-                font {
-                    pointSize: 16
-                    family: Theme.font
-                }
-                color: Theme.txt2
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -8
-                    onClicked: Sessions.next()
-                }
-            }
-        }
-
-        Item {
-            id: pwAnchor
-            x: 500 - 100
-            y: 55 - 25
-
-            width: 200
-            height: 50
-
-            SequentialAnimation {
-                id: shakeAnim
-                NumberAnimation {
-                    target: pwAnchor
-                    property: "x"
-                    to: pwAnchor.x + 10
-                    duration: 50
-                }
-                NumberAnimation {
-                    target: pwAnchor
-                    property: "x"
-                    to: pwAnchor.x - 20
-                    duration: 50
-                }
-                NumberAnimation {
-                    target: pwAnchor
-                    property: "x"
-                    to: pwAnchor.x + 14
-                    duration: 50
-                }
-                NumberAnimation {
-                    target: pwAnchor
-                    property: "x"
-                    to: pwAnchor.x - 14
-                    duration: 50
-                }
-                NumberAnimation {
-                    target: pwAnchor
-                    property: "x"
-                    to: 500 - 100
-                    duration: 50
-                }
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: 25
-                color: "transparent"
-                border.width: 2
-                border.color: root.respFailed ? Theme.err : Theme.acct
-                Behavior on border.color {
-                    ColorAnimation {
-                        duration: 300
+                ClippingRectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 140
+                    height: 140
+                    radius: 70
+                    color: "transparent"
+                    border.color: Theme.acct
+                    border.width: 2
+                    Image {
+                        anchors.fill: parent
+                        source: root.avatarPath ? "file://" + root.avatarPath : ""
+                        visible: root.avatarPath.length > 0
                     }
-                }
-
-                Rectangle {
-                    anchors {
-                        fill: parent
-                        margins: 2
-                    }
-                    color: "#99000000"
-                    radius: 25
-
-                    Keys.onPressed: function (event) {
-                        if (event.key === Qt.Key_Escape) {
-                            root._cancel();
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Tab) {
-                            Sessions.next();
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Backtab) {
-                            Sessions.prev();
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Up) {
-                            root._changeUser(-1);
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Down) {
-                            root._changeUser(1);
-                            event.accepted = true;
+                    Text {
+                        anchors.centerIn: parent
+                        visible: root.avatarPath.length === 0
+                        text: String.fromCodePoint(0xF007)
+                        font {
+                            pointSize: 52
+                            family: Theme.font
                         }
+                        color: Theme.txt2
                     }
+                }
+            }
 
-                    TextInput {
-                        id: inputField
-                        enabled: root.step === "prompt"
-                        cursorDelegate: Item {}
-                        anchors {
-                            fill: parent
-                            leftMargin: 8
-                            rightMargin: 8
-                        }
-                        echoMode: root.promptEcho ? TextInput.Normal : TextInput.Password
-                        passwordCharacter: " "
+            Item {
+                width: parent.width
+                height: usernameRow.implicitHeight
+
+                Row {
+                    id: usernameRow
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 10
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: String.fromCodePoint(0xF053)
                         font {
                             pointSize: 14
                             family: Theme.font
                         }
-                        color: root.respFailed ? Theme.err : Theme.txt1
-                        verticalAlignment: TextInput.AlignVCenter
-                        horizontalAlignment: TextInput.AlignHCenter
-                        focus: true
+                        color: Theme.txt2
+                        MouseArea {
+                            anchors.fill: parent
+                            anchors.margins: -8
+                            onClicked: root._changeUser(-1)
+                        }
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 200
+                        elide: Text.ElideRight
+                        horizontalAlignment: Text.AlignHCenter
+                        text: Users.current || "No user found"
+                        font {
+                            pointSize: 16
+                            family: Theme.font
+                        }
+                        color: Theme.txt1
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: String.fromCodePoint(0xF054)
+                        font {
+                            pointSize: 14
+                            family: Theme.font
+                        }
+                        color: Theme.txt2
+                        MouseArea {
+                            anchors.fill: parent
+                            anchors.margins: -8
+                            onClicked: root._changeUser(1)
+                        }
+                    }
+                }
+            }
 
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: 300
+            Item {
+                id: pwAnchor
+                width: parent.width
+                height: 46
+
+                SequentialAnimation {
+                    id: shakeAnim
+                    NumberAnimation {
+                        target: pwAnchor
+                        property: "x"
+                        to: 10
+                        duration: 50
+                    }
+                    NumberAnimation {
+                        target: pwAnchor
+                        property: "x"
+                        to: -10
+                        duration: 50
+                    }
+                    NumberAnimation {
+                        target: pwAnchor
+                        property: "x"
+                        to: 7
+                        duration: 50
+                    }
+                    NumberAnimation {
+                        target: pwAnchor
+                        property: "x"
+                        to: -7
+                        duration: 50
+                    }
+                    NumberAnimation {
+                        target: pwAnchor
+                        property: "x"
+                        to: 0
+                        duration: 50
+                    }
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.radius
+                    color: "transparent"
+                    border.width: 2
+                    border.color: root.respFailed ? Theme.err : Theme.acct
+                    Behavior on border.color {
+                        ColorAnimation {
+                            duration: 300
+                        }
+                    }
+
+                    Rectangle {
+                        anchors {
+                            fill: parent
+                            margins: 2
+                        }
+                        color: "#33ffffff"
+                        radius: Theme.radius - 2
+
+                        Keys.onPressed: function (event) {
+                            if (event.key === Qt.Key_Escape) {
+                                root._cancel();
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Tab) {
+                                Sessions.next();
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Backtab) {
+                                Sessions.prev();
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Up) {
+                                root._changeUser(-1);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Down) {
+                                root._changeUser(1);
+                                event.accepted = true;
                             }
                         }
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: root.step !== "prompt" ? root.promptLabel : ""
-                            font: inputField.font
-                            color: Theme.txt2
-                            visible: inputField.text.length === 0
-                        }
+                        TextInput {
+                            id: inputField
+                            enabled: root.step === "prompt"
+                            cursorDelegate: Item {}
+                            anchors {
+                                fill: parent
+                                leftMargin: 8
+                                rightMargin: 8
+                            }
+                            echoMode: root.promptEcho ? TextInput.Normal : TextInput.Password
+                            passwordCharacter: " "
+                            font {
+                                pointSize: 14
+                                family: Theme.font
+                            }
+                            color: root.respFailed ? Theme.err : Theme.txt1
+                            verticalAlignment: TextInput.AlignVCenter
+                            horizontalAlignment: TextInput.AlignHCenter
+                            focus: true
 
-                        Keys.onReturnPressed: root._submit()
-                        Keys.onEnterPressed: root._submit()
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: 300
+                                }
+                            }
 
-                        Row {
-                            anchors.centerIn: parent
-                            spacing: 2
-                            visible: root.step === "prompt" && !root.promptEcho
+                            Text {
+                                anchors.centerIn: parent
+                                text: root.step !== "prompt" ? root.promptLabel : ""
+                                font: inputField.font
+                                color: Theme.txt2
+                                visible: inputField.text.length === 0
+                            }
 
-                            Repeater {
-                                model: inputField.text.length
+                            Keys.onReturnPressed: root._submit()
+                            Keys.onEnterPressed: root._submit()
 
-                                delegate: Item {
-                                    width: 10
-                                    height: 10
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: 2
+                                visible: root.step === "prompt" && !root.promptEcho
 
-                                    Rectangle {
-                                        anchors.centerIn: parent
+                                Repeater {
+                                    model: inputField.text.length
+
+                                    delegate: Item {
                                         width: 10
                                         height: 10
-                                        radius: 5
-                                        color: root.respFailed ? Theme.err : Theme.txt1
-                                        Behavior on color {
-                                            ColorAnimation {
-                                                duration: 300
+
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            width: 10
+                                            height: 10
+                                            radius: 5
+                                            color: root.respFailed ? Theme.err : Theme.txt1
+                                            Behavior on color {
+                                                ColorAnimation {
+                                                    duration: 300
+                                                }
                                             }
                                         }
                                     }
@@ -519,15 +515,85 @@ Item {
                 }
             }
 
-            Text {
-                anchors {
-                    top: parent.bottom
-                    horizontalCenter: parent.horizontalCenter
+            Item {
+                width: parent.width
+                height: sessionRow.implicitHeight
+
+                Row {
+                    id: sessionRow
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 10
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: String.fromCodePoint(0xF053)
+                        font {
+                            pointSize: 11
+                            family: Theme.font
+                        }
+                        color: Theme.txt2
+                        MouseArea {
+                            anchors.fill: parent
+                            anchors.margins: -8
+                            onClicked: Sessions.prev()
+                        }
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: String.fromCodePoint(0xF108) + "  "
+                        font {
+                            pointSize: 11
+                            family: Theme.font
+                        }
+                        color: Theme.txt2
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 170
+                        elide: Text.ElideRight
+                        horizontalAlignment: Text.AlignHCenter
+                        text: Sessions.current ? Sessions.current.name : "No session found"
+                        font {
+                            pointSize: 11
+                            family: Theme.font
+                        }
+                        color: Theme.txt2
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: String.fromCodePoint(0xF054)
+                        font {
+                            pointSize: 11
+                            family: Theme.font
+                        }
+                        color: Theme.txt2
+                        MouseArea {
+                            anchors.fill: parent
+                            anchors.margins: -8
+                            onClicked: Sessions.next()
+                        }
+                    }
                 }
-                anchors.topMargin: 6
+            }
+
+            Text {
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                visible: CapsLock.active
+                text: String.fromCodePoint(0xF071) + " caps lock is on"
+                font {
+                    pointSize: 11
+                    family: Theme.font
+                }
+                color: Theme.err
+            }
+
+            Text {
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
                 text: root.failText
                 font {
-                    pointSize: 12
+                    pointSize: 11
                     family: Theme.font
                 }
                 color: Theme.err
@@ -538,103 +604,110 @@ Item {
                     }
                 }
             }
-        }
-
-        Text {
-            visible: CapsLock.active
-            x: 500 - implicitWidth / 2
-            y: 120 - implicitHeight / 2
-            text: String.fromCodePoint(0xF071) + " caps lock is on"
-            font {
-                pointSize: 12
-                family: Theme.font
-            }
-            color: Theme.err
-        }
-
-        Text {
-            width: 360
-            x: 500 - width / 2
-            y: 155 - implicitHeight / 2
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            text: root.step === "launching" ? "Launching…" : "enter confirm · tab/↑↓ switch · esc clear"
-            font {
-                pointSize: 11
-                family: Theme.font
-            }
-            color: Theme.txt2
-        }
-
-        Row {
-            x: 500 - implicitWidth / 2
-            y: 195 - implicitHeight / 2
-            spacing: 50
 
             Text {
-                text: String.fromCodePoint(0xF011)
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+                text: root.step === "launching" ? "Launching…" : "enter confirm · tab/↑↓ switch · esc clear"
                 font {
-                    pointSize: 20
+                    pointSize: 10
                     family: Theme.font
                 }
-                color: root.powerArmed && root.powerAction === "poweroff" ? Theme.err : Theme.txt2
-                Behavior on color {
-                    ColorAnimation {
-                        duration: 200
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -12
-                    onClicked: root._powerTap("poweroff")
-                }
-            }
-            Text {
-                text: String.fromCodePoint(0xF021)
-                font {
-                    pointSize: 20
-                    family: Theme.font
-                }
-                color: root.powerArmed && root.powerAction === "reboot" ? Theme.err : Theme.txt2
-                Behavior on color {
-                    ColorAnimation {
-                        duration: 200
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -12
-                    onClicked: root._powerTap("reboot")
-                }
+                color: Theme.txt2
             }
         }
+    }
+
+    Row {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: parent.height / 2 + card.height / 2 + 30
+        spacing: 40
 
         Text {
-            visible: root.powerArmed
-            x: 500 - implicitWidth / 2
-            y: 225 - implicitHeight / 2
-            text: "tap again to confirm"
+            text: String.fromCodePoint(0xF011)
             font {
-                pointSize: 10
+                pointSize: 18
                 family: Theme.font
             }
-            color: Theme.err
+            color: root.powerArmed && root.powerAction === "poweroff" ? Theme.err : Theme.txt2
+            Behavior on color {
+                ColorAnimation {
+                    duration: 200
+                }
+            }
+            MouseArea {
+                anchors.fill: parent
+                anchors.margins: -12
+                onClicked: root._powerTap("poweroff")
+            }
         }
-
         Text {
-            visible: !Greetd.available
-            width: 360
-            x: 500 - width / 2
-            y: 260 - implicitHeight / 2
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            text: "greetd socket not available"
+            text: String.fromCodePoint(0xF021)
             font {
-                pointSize: 12
+                pointSize: 18
                 family: Theme.font
             }
-            color: Theme.err
+            color: root.powerArmed && root.powerAction === "reboot" ? Theme.err : Theme.txt2
+            Behavior on color {
+                ColorAnimation {
+                    duration: 200
+                }
+            }
+            MouseArea {
+                anchors.fill: parent
+                anchors.margins: -12
+                onClicked: root._powerTap("reboot")
+            }
         }
+        Text {
+            text: String.fromCodePoint(0xF2DC)
+            font {
+                pointSize: 18
+                family: Theme.font
+            }
+            color: root.powerArmed && root.powerAction === "hibernate" ? Theme.err : Theme.txt2
+            Behavior on color {
+                ColorAnimation {
+                    duration: 200
+                }
+            }
+            MouseArea {
+                anchors.fill: parent
+                anchors.margins: -12
+                onClicked: root._powerTap("hibernate")
+            }
+        }
+    }
+
+    Text {
+        visible: root.powerArmed
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: parent.height / 2 + card.height / 2 + 60
+        text: "tap again to confirm"
+        font {
+            pointSize: 10
+            family: Theme.font
+        }
+        color: Theme.err
+    }
+
+    Text {
+        visible: !Greetd.available
+        width: 360
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            bottom: parent.bottom
+            bottomMargin: 20
+        }
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
+        text: "greetd socket not available"
+        font {
+            pointSize: 12
+            family: Theme.font
+        }
+        color: Theme.err
     }
 
     Rectangle {
