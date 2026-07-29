@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Wayland as Wayland
 import qs
 
 Scope {
@@ -32,11 +31,6 @@ Scope {
                 top: true
                 left: true
                 right: true
-            }
-
-            Wayland.IdleInhibitor {
-                window: root
-                enabled: IdleInhibitorState.active
             }
 
             Row {

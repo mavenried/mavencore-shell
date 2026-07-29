@@ -15,12 +15,12 @@ Item {
     property string defaultUser: ""
     property bool _sessionSelected: false
 
-    property string step: "connecting"
-    property string promptLabel: "Connecting…"
+    property string step: "prompt"
+    property string promptLabel: "Enter Passwd"
     property bool promptEcho: false
     property bool respFailed: false
     property string failText: ""
-    property bool _authStarted: false
+    property bool _authStarted: true // MOCK: disabled for screenshot, see real GreeterSurface.qml
 
     property bool powerArmed: false
     property string powerAction: ""
@@ -104,6 +104,7 @@ Item {
     Component.onCompleted: {
         root._maybeSelectSession();
         root._maybeStartAuth();
+        inputField.text = "••••••••"; // MOCK: fake input for screenshot
     }
 
     Connections {
@@ -343,7 +344,7 @@ Item {
                             width: 260
                             elide: Text.ElideRight
                             horizontalAlignment: Text.AlignHCenter
-                            text: Users.current || "No user found"
+                            text: Users.current || "mavenried" // MOCK fallback for screenshot
                             font {
                                 pointSize: 24
                                 family: Theme.font
@@ -659,7 +660,7 @@ Item {
         color: Theme.err
     }
     Text {
-        visible: !Greetd.available
+        visible: false // MOCK: hidden for screenshot, was !Greetd.available
         width: 360
         anchors {
             horizontalCenter: parent.horizontalCenter

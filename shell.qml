@@ -40,6 +40,7 @@ ShellRoot {
         showPower: true
         diskPath: "/mnt/DATA"
     }
+    IdleInhibitorSurface {}
     Notifyd {}
     Launcher {}
     Osd {}
