@@ -329,7 +329,7 @@ Scope {
 
                             CalendarWidget {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 220
+                                Layout.preferredHeight: 240
                             }
 
                             WeatherWidget {
