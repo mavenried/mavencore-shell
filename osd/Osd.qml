@@ -65,6 +65,39 @@ Scope {
 
     IpcHandler {
         target: "osd"
+
+        function set_brightness(value: real) {
+            value = Math.max(0.0, Math.min(1.0, Number(value)));
+            if (!isFinite(value))
+                return;
+
+            console.debug("Set Brightness: " + value);
+            root.icons = [String.fromCodePoint(0xF00DE), [String.fromCodePoint(0xF00DF), String.fromCodePoint(0xF00E0)]];
+            root.show_osd(
+                "brightnessctl s " + Math.round(value * 100) +
+                "% > /dev/null; brightnessctl -m | awk -F ',' '{gsub(/%/, \"\");print $4}'"
+            );
+        }
+
+        function set_volume(value: real)
+        {
+            value = Math.max(0.0, Math.min(1.0, Number(value)));
+            if (!isFinite(value))
+                return;
+
+            console.debug("Set Volume: " + value);
+            root.icons = [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]];
+
+            const sink = Pipewire.defaultAudioSink;
+            if (sink && sink.ready && sink.audio) {
+                sink.audio.muted = false;
+                sink.audio.volume = value;
+            }
+
+            root.updateVolumePct();
+            root.reveal();
+        }
+
         function volume_up() {
             console.debug("Volume Up");
             root.icons = [String.fromCodePoint(0xF075F), [String.fromCodePoint(0xF0580), String.fromCodePoint(0xF057E)]];

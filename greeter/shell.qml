@@ -12,17 +12,26 @@ ShellRoot {
     Variants {
         model: Quickshell.screens
 
-        FloatingWindow {
+        PanelWindow {
             id: win
             required property var modelData
             screen: modelData
 
-            visible: true
-            fullscreen: true
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
+
+            exclusiveZone: 0
+            aboveWindows: true
+            focusable: true
             color: "black"
 
             GreeterSurface {
                 anchors.fill: parent
+
                 blurPath: "/mnt/DATA/Pictures/CURRENT_BLUR"
                 avatarPath: "/mnt/DATA/Pictures/AVATAR"
                 lastUserPath: "/var/lib/greetd/.quickshell-last-user"
