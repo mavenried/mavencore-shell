@@ -33,69 +33,53 @@ Scope {
 
     Timer {
         id: btRefreshTimer
-        interval: 3000
+        interval: 1000
         repeat: true
         running: ot.open
-        onTriggered: btDevicesProc.running = true
+        onTriggered: btRefreshProc.running = true
     }
 
     Process {
-        id: btPowerProc
-        command: ["bluetoothctl", "show"]
-        stdout: StdioCollector {
-            onStreamFinished: root.bluetoothEnabled = this.text.includes("Powered: yes")
-        }
-        Component.onCompleted: running = true
-    }
-
-    Process {
-        id: btDevicesProc
-        command: ["bluetoothctl", "devices"]
+        id: btRefreshProc
+        command: [
+            "sh", "-c",
+            "echo \"POWER:$(bluetoothctl show | grep -q 'Powered: yes' && echo 1 || echo 0)\"; " +
+            "bluetoothctl devices | while read -r _ mac name; do " +
+            "echo \"DEV:$mac|$name|$(bluetoothctl info \"$mac\" | grep -q 'Connected: yes' && echo 1 || echo 0)\"; " +
+            "done"
+        ]
         stdout: StdioCollector {
             onStreamFinished: {
                 const lines = this.text.trim().split("\n").filter(l => l.length > 0);
-                const devs = lines.map(line => {
-                    const parts = line.split(" ");
-                    return {
-                        mac: parts[1] || "",
-                        name: parts.slice(2).join(" ") || parts[1] || "",
-                        connected: false
-                    };
-                });
-                btConnectedProc.pendingDevices = devs;
-                btConnectedProc.index = 0;
-                if (devs.length > 0)
-                    btConnectedProc.running = true;
-                else
-                    root.btDevices = [];
+                let powered = false;
+                const devs = [];
+
+                for (const line of lines) {
+                    if (line.startsWith("POWER:")) {
+                        powered = line.substring(6) === "1";
+                    } else if (line.startsWith("DEV:")) {
+                        const parts = line.substring(4).split("|");
+                        if (parts.length >= 3) {
+                            devs.push({
+                                mac: parts[0],
+                                name: parts[1] || parts[0],
+                                connected: parts[2] === "1"
+                            });
+                        }
+                    }
+                }
+
+                root.bluetoothEnabled = powered;
+                root.btDevices = devs;
             }
         }
         Component.onCompleted: running = true
-    }
-
-    Process {
-        id: btConnectedProc
-        property var pendingDevices: []
-        property int index: 0
-        command: index < pendingDevices.length ? ["bluetoothctl", "info", (pendingDevices[index] ? pendingDevices[index].mac : "") || ""] : []
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const dev = btConnectedProc.pendingDevices[btConnectedProc.index];
-                if (dev)
-                    dev.connected = this.text.includes("Connected: yes");
-                btConnectedProc.index++;
-                if (btConnectedProc.index < btConnectedProc.pendingDevices.length)
-                    btConnectedProc.running = true;
-                else
-                    root.btDevices = btConnectedProc.pendingDevices;
-            }
-        }
     }
 
     Process {
         id: btActionProc
         stdout: StdioCollector {
-            onStreamFinished: btDevicesProc.running = true
+            onStreamFinished: btRefreshProc.running = true
         }
     }
 
@@ -103,16 +87,15 @@ Scope {
         btActionProc.command = ["bluetoothctl", "connect", mac];
         btActionProc.running = true;
     }
+
     function btDisconnect(mac) {
         btActionProc.command = ["bluetoothctl", "disconnect", mac];
         btActionProc.running = true;
     }
+
     function btTogglePower() {
-        btActionProc.command = ["bluetoothctl", root.bluetoothEnabled ? "power off" : "power on"];
+        btActionProc.command = ["bluetoothctl", "power", root.bluetoothEnabled ? "off" : "on"];
         btActionProc.running = true;
-        Qt.callLater(() => {
-            btPowerProc.running = true;
-        }, 600);
     }
 
     // ── WiFi connection state ────────────────────────────────────────
@@ -121,6 +104,7 @@ Scope {
     property bool showPasswordDialog: false
     property string statusMessage: ""
     property bool connecting: false
+    property int selectedTab: 0
 
     // ── UI ───────────────────────────────────────────────────────────
     LazyLoader {
@@ -160,8 +144,9 @@ Scope {
                 Rectangle {
                     id: panel
                     anchors.centerIn: parent
-                    width: 800
-                    height: mainLayout.implicitHeight + 40
+                    width: 860
+                    height: Math.min(mainLayout.implicitHeight + 40, parent.height - 48)
+                    implicitHeight: mainLayout.implicitHeight + 40
                     radius: Theme.radius
                     color: Theme.bgnd
                     border.color: Theme.acct
@@ -190,13 +175,79 @@ Scope {
                             top: parent.top
                             left: parent.left
                             right: parent.right
-                            margins: 20
+                            margins: 24
                             topMargin: 20
                         }
-                        spacing: 12
+                        spacing: 16
 
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            ColumnLayout {
+                                spacing: 2
+                                Text {
+                                    text: "Connections"
+                                    font.pixelSize: 22
+                                    font.family: Theme.font
+                                    font.bold: true
+                                    color: Theme.txt1
+                                }
+                           }
+
+                            Item {
+                                Layout.fillWidth: true
+                            }
+
+                            Text {
+                                text: Network.active ? Network.active.ssid : "Disconnected"
+                                font.pixelSize: 22
+                                font.family: Theme.font
+                                color: Network.active ? Theme.mmry : Theme.txt2
+                                elide: Text.ElideRight
+                            }
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 8
+
+                            Repeater {
+                                model: ["Wi-Fi", "Bluetooth"]
+                                delegate: Rectangle {
+                                    required property string modelData
+                                    required property int index
+                                    Layout.fillWidth: true
+                                    height: 38
+                                    radius: Theme.radius
+                                    color: root.selectedTab === index ? Theme.mmry : "transparent"
+                                    border.color: root.selectedTab === index ? Theme.mmry : Theme.sptr
+                                    border.width: 1
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: (index === 0 ? String.fromCodePoint(0xF05A9) : String.fromCodePoint(0xF00AF)) + "  " + modelData
+                                        font.pixelSize: 13
+                                        font.family: Theme.font
+                                        font.bold: root.selectedTab === index
+                                        color: root.selectedTab === index ? Theme.bgnd : Theme.txt2
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: root.selectedTab = index
+                                    }
+                                }
+                            }
+                        }
+
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 1
+                            color: Theme.mmry
+                        }
                         WifiPanel {
                             Layout.fillWidth: true
+                            visible: root.selectedTab === 0
+                            Layout.preferredHeight: visible ? implicitHeight : 0
                             connecting: root.connecting
                             pendingSsid: root.pendingSsid
                             statusMessage: root.statusMessage
@@ -229,10 +280,13 @@ Scope {
                             Layout.fillWidth: true
                             height: 1
                             color: Theme.mmry
+                            visible: root.selectedTab === 0
                         }
 
                         BluetoothPanel {
                             Layout.fillWidth: true
+                            visible: root.selectedTab === 1
+                            Layout.preferredHeight: visible ? implicitHeight : 0
                             btEnabled: root.bluetoothEnabled
                             btDevices: root.btDevices
                             onConnectRequested: mac => root.btConnect(mac)
@@ -240,8 +294,11 @@ Scope {
                             onTogglePowerRequested: root.btTogglePower()
                         }
 
-                        Item {
-                            height: 4
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 1
+                            color: Theme.mmry
+                            visible: root.selectedTab === 1
                         }
                     }
 

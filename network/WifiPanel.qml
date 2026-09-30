@@ -54,7 +54,7 @@ Item {
                 Text {
                     id: wifiToggleLbl
                     anchors.centerIn: parent
-                    text: Network.wifiEnabled ? String.fromCodePoint(0xF05A9) + "  Wi-Fi ON" : String.fromCodePoint(0xF05AA) + "  Wi-Fi OFF"
+                    text: Network.wifiEnabled ? String.fromCodePoint(0xF05A9) + "  ON" : String.fromCodePoint(0xF05AA) + " OFF"
                     font.pixelSize: 13
                     font.family: Theme.font
                     color: Theme.bgnd
@@ -65,28 +65,28 @@ Item {
                 }
             }
 
-            Rectangle {
-                width: 120
-                height: scanLbl.height + 10
-                radius: Theme.radius
-                color: Theme.bgnd
-                border.color: Network.scanning ? Theme.mmry : Theme.acct
-                border.width: 2
+            // Rectangle {
+            //     width: 120
+            //     height: scanLbl.height + 10
+            //     radius: Theme.radius
+            //     color: Theme.bgnd
+            //     border.color: Network.scanning ? Theme.mmry : Theme.acct
+            //     border.width: 2
 
-                Text {
-                    id: scanLbl
-                    anchors.centerIn: parent
-                    text: Network.scanning ? String.fromCodePoint(0xF0450) + "  scanning" + String.fromCodePoint(0x2026) : String.fromCodePoint(0xF0450) + "  scan"
-                    font.pixelSize: 13
-                    font.family: Theme.font
-                    color: Network.scanning ? Theme.mmry : Theme.txt2
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    enabled: !Network.scanning
-                    onClicked: Network.rescanWifi()
-                }
-            }
+            //     Text {
+            //         id: scanLbl
+            //         anchors.centerIn: parent
+            //         text: Network.scanning ? String.fromCodePoint(0xF0450) + "  scanning" + String.fromCodePoint(0x2026) : String.fromCodePoint(0xF0450) + "  scan"
+            //         font.pixelSize: 13
+            //         font.family: Theme.font
+            //         color: Network.scanning ? Theme.mmry : Theme.txt2
+            //     }
+            //     MouseArea {
+            //         anchors.fill: parent
+            //         enabled: !Network.scanning
+            //         onClicked: Network.rescanWifi()
+            //     }
+            // }
         }
 
         // ── Status message ────────────────────────────────────────────
@@ -102,7 +102,7 @@ Item {
         // ── Network list ──────────────────────────────────────────────
         Rectangle {
             Layout.fillWidth: true
-            height: Math.min(wifiList.contentHeight, 220)
+            height: 300 //Math.min(wifiList.contentHeight, 300)
             color: "transparent"
             visible: Network.wifiEnabled
             clip: true
@@ -140,7 +140,7 @@ Item {
                             leftMargin: 12
                             rightMargin: 12
                         }
-                        spacing: 8
+                        spacing: 10
 
                         Text {
                             text: {
@@ -194,9 +194,9 @@ Item {
                         }
 
                         Rectangle {
-                            width: 90
+                            width: 95
                             height: btnLbl.height + 8
-                            radius: Theme.radius
+                            radius: Theme.radius 
                             color: netItem.modelData.active ? Theme.bat5 : root.connecting && root.pendingSsid === netItem.modelData.ssid ? Theme.sptr : Theme.bgnd
                             border.color: netItem.modelData.active ? Theme.bat5 : Theme.acct
                             border.width: 1

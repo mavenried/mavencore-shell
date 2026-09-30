@@ -53,7 +53,7 @@ Item {
                 Text {
                     id: btToggleLbl
                     anchors.centerIn: parent
-                    text: root.btEnabled ? String.fromCodePoint(0xF00AF) + "  BT ON" : String.fromCodePoint(0xF00B2) + "  BT OFF"
+                    text: root.btEnabled ? String.fromCodePoint(0xF00AF) + "  ON" : String.fromCodePoint(0xF00B2) + " OFF"
                     font.pixelSize: 13
                     font.family: Theme.font
                     color: Theme.bgnd
@@ -68,7 +68,7 @@ Item {
         // ── Device list ───────────────────────────────────────────────
         Rectangle {
             Layout.fillWidth: true
-            height: Math.min(Math.max(btList.contentHeight, 36), 160)
+            height: 300 //Math.min(Math.max(btList.contentHeight, 36), 300)
             color: "transparent"
             clip: true
             visible: root.btEnabled

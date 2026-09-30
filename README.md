@@ -40,7 +40,7 @@ ShellRoot {
         diskPaths: ["/", "/mnt/DATA"]          // drives shown in stats widget
         scratchpadPath: "/path/to/scratch.txt" // persistent scratchpad file
         todoPath:       "/path/to/todo.txt"    // persistent todo file
-        networkIface:   "wlan0"                // interface for network speed
+        networkIface:   "all"                  // interface for network speed ("all" or specific e.g. "wlan0")
         weatherLocation: "London"              // city name passed to wttr.in
     }
 
@@ -140,7 +140,7 @@ Opened with `open`, closed with `Escape` or `close`.
 
 ### Network Manager
 
-Wi-Fi scan and connect, Bluetooth device list. Password dialog appears automatically for secured networks.
+Tabbed Wi-Fi and Bluetooth manager with live network discovery. Wi-Fi scans refresh automatically while the shell is running, and the password dialog appears automatically for secured networks.
 
 ### Lock Screen
 

@@ -6,7 +6,7 @@ import qs
 WidgetCard {
     id: root
 
-    property string iface: "wlan0"
+    property string iface: "all"
     property real rxSpeed: 0
     property real txSpeed: 0
     property real rxPrev: -1
@@ -22,10 +22,15 @@ WidgetCard {
     }
 
     PolledProcess {
-        command: ["sh", "-c", "grep '" + root.iface + ":' /proc/net/dev | awk '{print $2, $10}'"]
+        command: [
+            "awk",
+            "-v", "iface=" + (root.iface || "all"),
+            "/:/ && !/^[ \\t]*lo:/ {sub(/:/, \" \"); if (iface == \"\" || iface == \"all\" || $1 == iface) { rx += $2; tx += $10 }} END {print rx+0, tx+0}",
+            "/proc/net/dev"
+        ]
         interval: 2000
         onReceived: function (data) {
-            var parts = data.split(/\s+/);
+            var parts = data.trim().split(/\s+/);
             if (parts.length < 2)
                 return;
             var rx = parseFloat(parts[0]);
@@ -60,7 +65,7 @@ WidgetCard {
         RowLayout {
             Layout.fillWidth: true
             Text {
-                text: String.fromCodePoint(0x2193) + "  " + root.iface
+                text: String.fromCodePoint(0x2193) + "  " + (root.iface && root.iface !== "all" ? root.iface : "Total")
                 color: Theme.wifi
                 font.pixelSize: 13
                 font.family: Theme.font
@@ -79,7 +84,7 @@ WidgetCard {
         RowLayout {
             Layout.fillWidth: true
             Text {
-                text: String.fromCodePoint(0x2191) + "  " + root.iface
+                text: String.fromCodePoint(0x2191) + "  " + (root.iface && root.iface !== "all" ? root.iface : "Total")
                 color: Theme.uptm
                 font.pixelSize: 13
                 font.family: Theme.font

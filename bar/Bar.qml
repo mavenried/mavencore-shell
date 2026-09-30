@@ -47,7 +47,7 @@ Scope {
                     onclick: ["ghostty", "-e", "yay", "-Syu", "--noconfirm"]
                     template: String.fromCodePoint(0xF303) + " %3s"
                     label: String.fromCodePoint(0xF303) + " ---"
-                    interval: 5000
+                    interval: 10000
                 }
 
                 Module {

@@ -590,12 +590,12 @@ Singleton {
         if (interfaceName && interfaceName.length > 0) {
             executeCommand([root.nmcliCommandDevice, "disconnect", interfaceName], result => {
                 if (callback)
-                    callback(result.success ? result.output : "");
+                    callback(result);
             });
         } else {
             executeCommand([root.nmcliCommandDevice, "disconnect", root.deviceTypeWifi], result => {
                 if (callback)
-                    callback(result.success ? result.output : "");
+                    callback(result);
             });
         }
     }
@@ -1262,6 +1262,31 @@ Singleton {
 
         command: ["nmcli", "dev", root.nmcliCommandWifi, "list", "--rescan", "yes"]
         onExited: root.getNetworks()
+    }
+
+    Timer {
+        id: networkRefreshTimer
+        interval: 10000
+        repeat: true
+        running: true
+        onTriggered: {
+            root.getNetworks();
+            root.getWifiStatus();
+            root.getWirelessInterfaces();
+            root.getEthernetInterfaces();
+        }
+    }
+
+    Timer {
+        id: networkRescanTimer
+        interval: 30000
+        repeat: true
+        running: true
+        onTriggered: {
+            if (!root.wifiEnabled || rescanProc.running)
+                return;
+            rescanProc.running = true;
+        }
     }
 
     Process {

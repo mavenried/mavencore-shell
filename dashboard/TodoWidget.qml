@@ -71,142 +71,143 @@ WidgetCard {
             Layout.bottomMargin: 4
         }
 
-        Repeater {
-            model: root.items
-            delegate: Item {
-                id: entry
-                required property var modelData
-                required property int index
+        ScrollView {
+            id: todoScroll
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredHeight: 1
+            Layout.minimumHeight: 0
+            contentWidth: availableWidth
+            clip: true
 
-                Layout.fillWidth: true
-                implicitHeight: modelData.type === "group" ? groupRow.implicitHeight + (index > 0 ? 12 : 0) : itemRow.implicitHeight + 4
+            ColumnLayout {
+                id: entries
+                width: todoScroll.availableWidth
+                spacing: 4
 
-                // ── Group header ─────────────────────────────────────
-                RowLayout {
-                    id: groupRow
-                    visible: entry.modelData.type === "group"
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                    }
-                    anchors.top: parent.top
-                    anchors.topMargin: entry.index > 0 ? 12 : 0
-                    spacing: 10
+                Repeater {
+                    model: root.items
+                    delegate: Item {
+                        id: entry
+                        required property var modelData
+                        required property int index
 
-                    Text {
-                        text: entry.modelData.text.toUpperCase()
-                        color: Theme.mmry
-                        font.pixelSize: 14
-                        font.bold: true
-                        font.family: Theme.font
-                        font.letterSpacing: 1
-                    }
-                    Rectangle {
                         Layout.fillWidth: true
-                        height: 1
-                        color: Theme.mmry
-                        opacity: 0.6
-                        Layout.alignment: Qt.AlignVCenter
-                    }
-                    Text {
-                        text: String.fromCodePoint(0xD7)
-                        color: Theme.acct
-                        font.pixelSize: 13
-                        font.family: Theme.font
+                        implicitHeight: modelData.type === "group" ? groupRow.implicitHeight + (index > 0 ? 12 : 0) : itemRow.implicitHeight + 4
+
+                        // ── Group header ─────────────────────────────────────
+                        RowLayout {
+                            id: groupRow
+                            visible: entry.modelData.type === "group"
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                            }
+                            anchors.top: parent.top
+                            anchors.topMargin: entry.index > 0 ? 12 : 0
+                            spacing: 10
+
+                            Text {
+                                text: entry.modelData.text.toUpperCase()
+                                color: Theme.mmry
+                                font.pixelSize: 14
+                                font.bold: true
+                                font.family: Theme.font
+                                font.letterSpacing: 1
+                            }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 1
+                                color: Theme.mmry
+                                opacity: 0.6
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+                            Text {
+                                text: String.fromCodePoint(0xD7)
+                                color: Theme.acct
+                                font.pixelSize: 13
+                                font.family: Theme.font
+                                MouseArea {
+                                    anchors.fill: parent
+                                    anchors.margins: -6
+                                    onClicked: {
+                                        var a = root.items.slice();
+                                        a.splice(entry.index, 1);
+                                        root.items = a;
+                                        root._serialize();
+                                    }
+                                }
+                            }
+                        }
+
+                        // ── Todo item ─────────────────────────────────────────
+                        RowLayout {
+                            id: itemRow
+                            visible: entry.modelData.type === "item"
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: parent.top
+                            }
+                            anchors.leftMargin: 2
+                            anchors.rightMargin: 2
+                            spacing: 10
+
+                            Rectangle {
+                                width: 20
+                                height: 20
+                                radius: 4
+                                Layout.alignment: Qt.AlignTop
+                                color: entry.modelData.done ? Theme.pfle : "transparent"
+                                border.color: entry.modelData.done ? Theme.pfle : Qt.rgba(1, 1, 1, 0.2)
+                                border.width: 2
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: String.fromCodePoint(0x00d7)
+                                    color: Theme.bgnd
+                                    font.pixelSize: 12
+                                    visible: entry.modelData.done
+                                }
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: entry.modelData.text
+                                color: entry.modelData.done ? Theme.txt2 : Theme.txt1
+                                font.pixelSize: 16
+                                font.family: Theme.font
+                                font.strikeout: entry.modelData.done
+                                wrapMode: Text.Wrap
+                            }
+
+                        }
+
                         MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -6
+                            enabled: entry.modelData.type === "item"
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            anchors {
+                                fill: parent
+                            }
                             onClicked: {
                                 var a = root.items.slice();
-                                a.splice(entry.index, 1);
+                                if (mouse.button === Qt.RightButton) {
+                                    if (!entry.modelData.done)
+                                        return;
+                                    a.splice(entry.index, 1);
+                                } else {
+                                    a[entry.index] = {
+                                        type: "item",
+                                        done: !entry.modelData.done,
+                                        text: entry.modelData.text
+                                    };
+                                }
                                 root.items = a;
                                 root._serialize();
                             }
                         }
-                    }
-                }
-
-                // ── Todo item ─────────────────────────────────────────
-                RowLayout {
-                    id: itemRow
-                    visible: entry.modelData.type === "item"
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: parent.top
-                    }
-                    anchors.leftMargin: 2
-                    anchors.rightMargin: 2
-                    spacing: 10
-
-                    Rectangle {
-                        width: 20
-                        height: 20
-                        radius: 4
-                        Layout.alignment: Qt.AlignTop
-                        color: entry.modelData.done ? Theme.pfle : "transparent"
-                        border.color: entry.modelData.done ? Theme.pfle : Qt.rgba(1, 1, 1, 0.2)
-                        border.width: 2
-                        Text {
-                            anchors.centerIn: parent
-                            text: String.fromCodePoint(0x00d7)
-                            color: Theme.bgnd
-                            font.pixelSize: 12
-                            visible: entry.modelData.done
-                        }
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: entry.modelData.text
-                        color: entry.modelData.done ? Theme.txt2 : Theme.txt1
-                        font.pixelSize: 16
-                        font.family: Theme.font
-                        font.strikeout: entry.modelData.done
-                        wrapMode: Text.Wrap
-                    }
-
-                    Text {
-                        text: String.fromCodePoint(0xD7)
-                        color: Theme.acct
-                        font.pixelSize: 16
-                        font.family: Theme.font
-                        Layout.alignment: Qt.AlignTop
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -6
-                            onClicked: {
-                                var a = root.items.slice();
-                                a.splice(entry.index, 1);
-                                root.items = a;
-                                root._serialize();
-                            }
-                        }
-                    }
-                }
-
-                MouseArea {
-                    enabled: entry.modelData.type === "item"
-                    anchors {
-                        fill: parent
-                        rightMargin: 28
-                    }
-                    onClicked: {
-                        var a = root.items.slice();
-                        a[entry.index] = {
-                            type: "item",
-                            done: !entry.modelData.done,
-                            text: entry.modelData.text
-                        };
-                        root.items = a;
-                        root._serialize();
                     }
                 }
             }
-        }
-
-        Item {
-            Layout.fillHeight: true
         }
 
         RowLayout {

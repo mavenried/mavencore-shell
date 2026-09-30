@@ -31,7 +31,7 @@ ShellRoot {
     Dashboard {
         scratchpadPath: "/mnt/DATA/Documents/scratches/.mavencore-scratchpad"
         todoPath: "/mnt/DATA/Documents/scratches/.mavencore-todo"
-        networkIface: "wlan0"
+        networkIface: "all"
         weatherLocation: "Kochi"
     }
     NetworkManager {}

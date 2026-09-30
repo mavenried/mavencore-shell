@@ -12,7 +12,7 @@ Scope {
     property string weatherLocation: ""
     property string scratchpadPath: ""
     property string todoPath: ""
-    property string networkIface: "wlan0"
+    property string networkIface: "all"
 
     // ── Weather cache (outside LazyLoader — persists across open/close) ──────
     property string wxLocation: String.fromCodePoint(0x2014)
@@ -306,19 +306,42 @@ Scope {
                             TodoWidget {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                Layout.preferredHeight: 1
+                                Layout.minimumHeight: 0
+                                Layout.maximumHeight: Infinity
                                 savePath: root.todoPath || "/tmp/qs-todo.txt"
+                            }
+
+                            ScratchpadWidget {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                Layout.preferredHeight: 1
+                                Layout.minimumHeight: 0
+                                Layout.maximumHeight: Infinity
+                                savePath: root.scratchpadPath || "/tmp/qs-scratch.txt"
                             }
                         }
 
-                        // ── Middle: Planning ──────────────────────────
+                        // ── Right: Connections ────────────────────────
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             spacing: 10
-                            ScratchpadWidget {
+
+                            WifiConnectionWidget {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                savePath: root.scratchpadPath || "/tmp/qs-scratch.txt"
+                                Layout.preferredHeight: 1
+                                Layout.minimumHeight: 0
+                                Layout.maximumHeight: Infinity
+                            }
+
+                            BluetoothConnectionWidget {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                Layout.preferredHeight: 1
+                                Layout.minimumHeight: 0
+                                Layout.maximumHeight: Infinity
                             }
                         }
                         // ── Right: Personal ───────────────────────────
