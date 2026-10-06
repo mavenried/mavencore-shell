@@ -40,81 +40,76 @@ WidgetCard {
         anchors.margins: 14
         spacing: 8
 
-        Text {
-            text: "Now Playing"
-            color: Theme.txt1
-            font.pixelSize: 20
-            font.bold: true
-            font.family: Theme.font
-        }
+        Rectangle {
+            visible: root.hasArt
+            width: 200
+            height: 200
+            radius: 8
+            color: Theme.bgnd
+            clip: true
+            Layout.alignment: Qt.AlignCenter
 
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            spacing: 12
+            ClippingRectangle {
+                anchors.fill: parent
+                radius: Theme.radius - 10
 
-            Rectangle {
-                visible: root.hasArt
-                width: 120
-                height: 120
-                radius: 8
-                color: Theme.bgnd
-                clip: true
-                Layout.alignment: Qt.AlignTop
-
-                ClippingRectangle {
+                Image {
                     anchors.fill: parent
-                    radius: Theme.radius - 10
-
-                    Image {
-                        anchors.fill: parent
-                        source: root.artUrl
-                        fillMode: Image.PreserveAspectCrop
-                        asynchronous: true
-                        smooth: true
-                    }
+                    source: root.artUrl
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    smooth: true
                 }
             }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 8
 
             ColumnLayout {
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: 8
+                spacing: 3
 
-                ColumnLayout {
+                Text {
                     Layout.fillWidth: true
-                    spacing: 3
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: root.title
-                        color: Theme.txt1
-                        font.pixelSize: 16
-                        font.bold: true
-                        font.family: Theme.font
-                        elide: Text.ElideRight
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: root.artist || root.status
-                        color: Theme.txt2
-                        font.pixelSize: 14
-                        font.family: Theme.font
-                        elide: Text.ElideRight
-                        horizontalAlignment: Text.AlignHCenter
-                    }
+                    text: root.title
+                    color: Theme.txt1
+                    font.pixelSize: 16
+                    font.bold: true
+                    font.family: Theme.font
+                    elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignHCenter
                 }
 
-                ColumnLayout {
-                    visible: root.lengthUs > 0
+                Text {
                     Layout.fillWidth: true
+                    text: root.artist || root.status
+                    color: Theme.txt2
+                    font.pixelSize: 14
+                    font.family: Theme.font
+                    elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+
+            Item {
+                visible: root.lengthUs > 0
+                Layout.alignment: Qt.AlignHCenter
+                implicitWidth: 220
+                implicitHeight: col.implicitHeight
+                width: 220
+                height: col.implicitHeight
+
+                Column {
+                    id: col
+                    width: 220
                     spacing: 3
 
                     Rectangle {
                         id: progressTrack
-                        Layout.fillWidth: true
+                        width: 220
                         height: 4
                         radius: 2
                         color: Qt.rgba(0, 0, 0, 0.2)
@@ -166,18 +161,25 @@ WidgetCard {
                         }
                     }
 
-                    RowLayout {
-                        Layout.fillWidth: true
+                    Item {
+                        width: 220
+                        implicitHeight: Math.max(posText.implicitHeight, lenText.implicitHeight)
+                        height: implicitHeight
+
                         Text {
+                            id: posText
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
                             text: root.fmt(root.positionUs)
                             color: Theme.txt2
                             font.pixelSize: 10
                             font.family: Theme.font
                         }
-                        Item {
-                            Layout.fillWidth: true
-                        }
+
                         Text {
+                            id: lenText
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
                             text: root.fmt(root.lengthUs)
                             color: Theme.txt2
                             font.pixelSize: 10
@@ -185,46 +187,46 @@ WidgetCard {
                         }
                     }
                 }
+            }
 
-                RowLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    spacing: 28
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 28
 
-                    Text {
-                        text: root.iconPrev
-                        color: Theme.txt2
-                        font.pixelSize: 18
-                        font.family: Theme.font
-                        verticalAlignment: Text.AlignVCenter
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -6
-                            onClicked: Quickshell.execDetached(["playerctl", "previous"])
-                        }
+                Text {
+                    text: root.iconPrev
+                    color: Theme.txt2
+                    font.pixelSize: 18
+                    font.family: Theme.font
+                    verticalAlignment: Text.AlignVCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.margins: -6
+                        onClicked: Quickshell.execDetached(["playerctl", "previous"])
                     }
-                    Text {
-                        text: root.isPlaying ? root.iconPause : root.iconPlay
-                        color: Theme.txt1
-                        font.pixelSize: 18
-                        font.family: Theme.font
-                        verticalAlignment: Text.AlignVCenter
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -6
-                            onClicked: Quickshell.execDetached(["playerctl", "play-pause"])
-                        }
+                }
+                Text {
+                    text: root.isPlaying ? root.iconPause : root.iconPlay
+                    color: Theme.txt1
+                    font.pixelSize: 18
+                    font.family: Theme.font
+                    verticalAlignment: Text.AlignVCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.margins: -6
+                        onClicked: Quickshell.execDetached(["playerctl", "play-pause"])
                     }
-                    Text {
-                        text: root.iconNext
-                        color: Theme.txt2
-                        font.pixelSize: 18
-                        font.family: Theme.font
-                        verticalAlignment: Text.AlignVCenter
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -6
-                            onClicked: Quickshell.execDetached(["playerctl", "next"])
-                        }
+                }
+                Text {
+                    text: root.iconNext
+                    color: Theme.txt2
+                    font.pixelSize: 18
+                    font.family: Theme.font
+                    verticalAlignment: Text.AlignVCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.margins: -6
+                        onClicked: Quickshell.execDetached(["playerctl", "next"])
                     }
                 }
             }

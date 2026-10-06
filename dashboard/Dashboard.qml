@@ -281,21 +281,30 @@ Scope {
                                 Layout.preferredHeight: 190
                             }
 
+                            WeatherWidget {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 200
+                                weatherLocation: root.wxLocation
+                                temperature: root.wxTemp
+                                feelsLike: root.wxFeelsLike
+                                condition: root.wxCondition
+                                humidity: root.wxHumidity
+                                windSpeed: root.wxWind
+                                icon: root.wxIcon
+                            }
+
                             NetworkWidget {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 130
                                 iface: root.networkIface
+
                             }
 
                             StatsWidget {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                             }
-                            UptimeWidget {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 220
-                            }
-                        }
+                         }
 
                         // ── Middle: Planning ──────────────────────────
                         ColumnLayout {
@@ -355,21 +364,9 @@ Scope {
                                 Layout.preferredHeight: 240
                             }
 
-                            WeatherWidget {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 190
-                                weatherLocation: root.wxLocation
-                                temperature: root.wxTemp
-                                feelsLike: root.wxFeelsLike
-                                condition: root.wxCondition
-                                humidity: root.wxHumidity
-                                windSpeed: root.wxWind
-                                icon: root.wxIcon
-                            }
-
                             MediaWidget {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 200
+                                Layout.preferredHeight: 380
                                 artist: root.mediaArtist
                                 title: root.mediaTitle
                                 status: root.mediaStatus
