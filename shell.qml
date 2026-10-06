@@ -10,6 +10,7 @@ import qs.wallpaper
 import qs.lockscreen
 import qs.dashboard
 import qs.polkit
+import qs.infowindow
 
 ShellRoot {
     // Change Conf Singleton options
@@ -43,6 +44,8 @@ ShellRoot {
     IdleInhibitorSurface {}
     Notifyd {}
     Launcher {}
+    // Larger rich-text views opened from the launcher.
+    InfoWindow {}
     Osd {}
     LockScreen {
         blurPath: "/mnt/DATA/Pictures/CURRENT_BLUR"

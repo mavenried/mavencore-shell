@@ -79,6 +79,7 @@ All modules are toggled via `qs ipc call`:
 | Command                              | Action                           |
 | ------------------------------------ | -------------------------------- |
 | `qs ipc call dashboard toggle`       | Open / close dashboard           |
+| `qs ipc call infowindow setContent "<title>" "<text>"` | Show titled text in the expanded info window |
 | `qs ipc call launcher open`          | Open launcher                    |
 | `qs ipc call launcher close`         | Close launcher                   |
 | `qs ipc call network-manager toggle` | Open / close network manager     |
@@ -137,6 +138,7 @@ Opened with `open`, closed with `Escape` or `close`.
 | _(none)_ | Fuzzy app search — `Tab` / `Shift+Tab` to cycle, `Enter` to launch |
 | `:`      | Shell command — `Enter` to run detached                            |
 | `=`      | Calculator via `qalc` — result shown inline                        |
+| `?`      | Wiktionary lookup — type `? word`; press `Enter` to expand result |
 
 ### Network Manager
 
