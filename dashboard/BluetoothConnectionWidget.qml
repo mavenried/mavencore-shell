@@ -91,7 +91,7 @@ WidgetCard {
         RowLayout {
             Layout.fillWidth: true
             Text {
-                text: String.fromCodePoint(0xF00AF) + "  Bluetooth"
+                text: String.fromCodePoint(0xF00AF) + " Bluetooth"
                 color: Theme.txt1
                 font.pixelSize: 20
                 font.bold: true

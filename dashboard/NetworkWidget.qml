@@ -55,7 +55,7 @@ WidgetCard {
         spacing: 14
 
         Text {
-            text: "Network"
+            text: " Network"
             color: Theme.txt1
             font.pixelSize: 20
             font.bold: true

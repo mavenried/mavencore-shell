@@ -16,11 +16,12 @@ WidgetCard {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 14
+        anchors.margins: 10
         spacing: 8
 
         Text {
-            text: "Notes"
+            text: "󰈚 Notes"
+            Layout.margins: 4
             color: Theme.txt1
             font.pixelSize: 20
             font.bold: true
@@ -30,7 +31,7 @@ WidgetCard {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "transparent"
+            color: Qt.rgba(0, 0, 0, 0.2)
             radius: Theme.radius
 
             ScrollView {
@@ -39,7 +40,7 @@ WidgetCard {
 
                 TextArea {
                     id: editor
-                    padding: 4
+                    padding: 10
                     color: Theme.txt1
                     font.pixelSize: 16
                     font.family: Theme.font

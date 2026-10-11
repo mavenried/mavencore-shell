@@ -14,7 +14,6 @@ Scope {
     property string todoPath: ""
     property string networkIface: "all"
 
-    // ── Weather cache (outside LazyLoader — persists across open/close) ──────
     property string wxLocation: String.fromCodePoint(0x2014)
     property string wxTemp: String.fromCodePoint(0x2014) + String.fromCodePoint(0xB0) + "C"
     property string wxFeelsLike: String.fromCodePoint(0x2014) + String.fromCodePoint(0xB0) + "C"
@@ -80,65 +79,9 @@ Scope {
         }
     }
 
-    // ── Pomodoro (outside LazyLoader — timer keeps running while closed) ────
-    property int pomWorkMins: 25
-    property int pomBreakMins: 5
-    property int pomLongBreakMins: 15
-    property string pomPhase: "idle"
-    property bool pomPaused: false
-    property int pomSecondsLeft: 25 * 60
-    property int pomSessions: 0
-
-    readonly property int pomTotalSeconds: {
-        if (pomPhase === "work")
-            return pomWorkMins * 60;
-        if (pomPhase === "longBreak")
-            return pomLongBreakMins * 60;
-        if (pomPhase !== "idle")
-            return pomBreakMins * 60;
-        return pomWorkMins * 60;
-    }
-
-    function pomAdvance() {
-        if (pomPhase === "work") {
-            pomSessions++;
-            pomPhase = (pomSessions % 4 === 0) ? "longBreak" : "break";
-            pomSecondsLeft = (pomPhase === "longBreak") ? pomLongBreakMins * 60 : pomBreakMins * 60;
-        } else {
-            pomPhase = "work";
-            pomSecondsLeft = pomWorkMins * 60;
-        }
-        pomPaused = false;
-    }
-
-    function pomStartPause() {
-        if (pomPhase === "idle") {
-            pomPhase = "work";
-            pomSecondsLeft = pomWorkMins * 60;
-            pomPaused = false;
-        } else {
-            pomPaused = !pomPaused;
-        }
-    }
-
-    function pomReset() {
-        pomPhase = "idle";
-        pomPaused = false;
-        pomSecondsLeft = pomWorkMins * 60;
-        pomSessions = 0;
-    }
-
-    Timer {
-        interval: 1000
-        running: root.pomPhase !== "idle" && !root.pomPaused
-        repeat: true
-        onTriggered: {
-            if (root.pomSecondsLeft > 0)
-                root.pomSecondsLeft--;
-            else
-                root.pomAdvance();
-        }
-    }
+    required property string countdownTarget
+    required property string countdownName
+    readonly property double countdownTargetEpoch: Date.parse(countdownTarget) / 1000
 
     // ── Media cache (outside LazyLoader — persists across open/close) ────────
     property string mediaArtist: ""
@@ -297,14 +240,13 @@ Scope {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 130
                                 iface: root.networkIface
-
                             }
 
                             StatsWidget {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                             }
-                         }
+                        }
 
                         // ── Middle: Planning ──────────────────────────
                         ColumnLayout {
@@ -375,17 +317,13 @@ Scope {
                                 lengthUs: root.mediaLengthUs
                             }
 
-                            PomodoroWidget {
+                            CountdownWidget {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                phase: root.pomPhase
-                                paused: root.pomPaused
-                                secondsLeft: root.pomSecondsLeft
-                                totalSeconds: root.pomTotalSeconds
-                                sessions: root.pomSessions
-                                onStartPauseClicked: root.pomStartPause()
-                                onResetClicked: root.pomReset()
-                                onSkipClicked: root.pomAdvance()
+                                targetEpoch: root.countdownTargetEpoch
+                                targetDate: root.countdownTarget
+                                countdownName: root.countdownName
+                                dashboardOpen: ot.open
                             }
                         }
                     }

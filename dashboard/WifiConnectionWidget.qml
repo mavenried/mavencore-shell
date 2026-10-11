@@ -42,7 +42,7 @@ WidgetCard {
         RowLayout {
             Layout.fillWidth: true
             Text {
-                text: String.fromCodePoint(0xF05A9) + "  WiFi"
+                text: String.fromCodePoint(0xF05A9) + " WiFi"
                 color: Theme.txt1
                 font.pixelSize: 20
                 font.bold: true
@@ -59,7 +59,6 @@ WidgetCard {
             //     elide: Text.ElideRight
             //     Layout.maximumWidth: 110
             // }
-
 
             Rectangle {
                 width: 60

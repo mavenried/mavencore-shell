@@ -63,7 +63,7 @@ WidgetCard {
         spacing: 4
 
         Text {
-            text: "Todo"
+            text: " Todo"
             color: Theme.txt1
             font.pixelSize: 20
             font.bold: true
@@ -217,7 +217,7 @@ WidgetCard {
             TextField {
                 id: inputField
                 Layout.fillWidth: true
-                placeholderText: "#<group> [task] or [task]"
+                placeholderText: "enter todo item"
                 placeholderTextColor: Theme.txt2
                 color: Theme.txt1
                 font.pixelSize: 20
