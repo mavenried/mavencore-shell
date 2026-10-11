@@ -8,6 +8,9 @@ Scope {
     id: scope
     required property string wallpaperPath
     property bool showTime: false
+    property var timeXOffset: 0.5
+    property var timeYOffset: 0.75
+
     Variants {
         model: Quickshell.screens
 
@@ -30,7 +33,7 @@ Scope {
 
             Image {
                 id: img
-                anchors.fill: parent
+                anchors.centerIn: parent
                 fillMode: Image.PreserveAspectCrop
                 source: scope.wallpaperPath
                 clip: true
@@ -39,8 +42,10 @@ Scope {
             Rectangle {
                 id: rect
                 visible: scope.showTime
-                x: 1920 / 2 - inner.width / 2
-                y: 780
+
+                x: parent.width * scope.timeXOffset - inner.width / 2
+                y: parent.height * scope.timeYOffset - inner.height / 2
+
                 width: inner.width
                 height: inner.height
                 color: "transparent"
@@ -50,7 +55,6 @@ Scope {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Qt.formatDateTime(clock.date, "<b>hh:mm</b>")
-                        // font.family: "JetbrainsMono Nerd Font"
                         font.family: Theme.font
                         color: Theme.mmry
                         font.pointSize: 20
@@ -60,7 +64,6 @@ Scope {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Qt.formatDateTime(clock.date, "dd|MM|yy")
-                        // font.family: "JetbrainsMono Nerd Font"
                         font.family: Theme.font
                         color: Theme.mmry
                         font.pointSize: 10
@@ -104,12 +107,14 @@ Scope {
                     fadeInTime.start();
                 }
             }
+
             FileView {
                 id: fv
                 path: Qt.resolvedUrl(scope.wallpaperPath)
                 watchChanges: true
                 onFileChanged: ipc.reload()
             }
+
             Component.onCompleted: {
                 ipc.reload();
             }
