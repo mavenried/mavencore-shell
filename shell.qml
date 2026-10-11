@@ -11,6 +11,7 @@ import qs.lockscreen
 import qs.dashboard
 import qs.polkit
 import qs.infowindow
+import qs.clipboard
 
 ShellRoot {
     // Change Conf Singleton options
@@ -22,6 +23,8 @@ ShellRoot {
     Wallpaper {
         wallpaperPath: "/mnt/DATA/Pictures/CURRENT"
         showTime: true
+        timeYOffset: 0.75
+        timeXOffset: 0.5
     }
     Binding {
         target: Conf
@@ -34,6 +37,8 @@ ShellRoot {
         todoPath: "/mnt/DATA/Documents/scratches/.mavencore-todo"
         networkIface: "all"
         weatherLocation: "Kochi"
+        countdownTarget: "27 Oct 2026"
+        countdownName: "ESE"
     }
     NetworkManager {}
     Bar {
@@ -44,6 +49,7 @@ ShellRoot {
     IdleInhibitorSurface {}
     Notifyd {}
     Launcher {}
+    Clipboard {}
     // Larger rich-text views opened from the launcher.
     InfoWindow {}
     Osd {}
