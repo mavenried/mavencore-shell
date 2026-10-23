@@ -775,6 +775,8 @@ Singleton {
                 }
             }
 
+            rNetworks.sort((a, b) => b.strength - a.strength);
+
             if (callback)
                 callback(root.networks);
             checkPendingConnection();
