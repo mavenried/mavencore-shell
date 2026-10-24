@@ -9,6 +9,7 @@ WidgetCard {
     id: root
 
     property bool bluetoothEnabled: false
+    property bool bluetoothScanning: false
     property list<var> devices: []
 
     function refresh() {
@@ -74,6 +75,22 @@ WidgetCard {
         }
     }
 
+    Process {
+        id: scanProcess
+        command: ["bluetoothctl"]
+        stdinEnabled: true
+    }
+
+    function toggleScan() {
+        root.bluetoothScanning = !root.bluetoothScanning;
+        if (root.bluetoothScanning && !scanProcess.running) {
+            scanProcess.running = true;
+            Qt.callLater(() => scanProcess.write("scan on\n"));
+        } else if (scanProcess.running) {
+            scanProcess.write(root.bluetoothScanning ? "scan on\n" : "scan off\n");
+        }
+    }
+
     Timer {
         interval: 5000
         repeat: true
@@ -96,9 +113,27 @@ WidgetCard {
                 font.pixelSize: 20
                 font.bold: true
                 font.family: Theme.font
-            }
-            Item {
                 Layout.fillWidth: true
+                elide: Text.ElideRight
+            }
+            Rectangle {
+                width: 54
+                height: 27
+                radius: Theme.radius
+                color: root.bluetoothScanning ? Theme.mmry : Theme.bgnd
+                border.color: Theme.sptr
+                Text {
+                    anchors.centerIn: parent
+                    text: root.bluetoothScanning ? "Stop" : "Scan"
+                    color: root.bluetoothScanning ? Theme.bgnd : Theme.txt2
+                    font.pixelSize: 12
+                    font.family: Theme.font
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: root.bluetoothEnabled
+                    onClicked: root.toggleScan()
+                }
             }
             Rectangle {
                 width: 60

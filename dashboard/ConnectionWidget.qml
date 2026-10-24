@@ -15,6 +15,7 @@ WidgetCard {
     property bool connecting: false
     property string statusMessage: ""
     property bool bluetoothEnabled: false
+    property bool bluetoothScanning: false
     property list<var> btDevices: []
 
     function refreshBluetooth() {
@@ -93,6 +94,22 @@ WidgetCard {
         id: btActionProc
         stdout: StdioCollector {
             onStreamFinished: root.refreshBluetooth()
+        }
+    }
+
+    Process {
+        id: btScanProc
+        command: ["bluetoothctl"]
+        stdinEnabled: true
+    }
+
+    function toggleBluetoothScan() {
+        root.bluetoothScanning = !root.bluetoothScanning;
+        if (root.bluetoothScanning && !btScanProc.running) {
+            btScanProc.running = true;
+            Qt.callLater(() => btScanProc.write("scan on\n"));
+        } else if (btScanProc.running) {
+            btScanProc.write(root.bluetoothScanning ? "scan on\n" : "scan off\n");
         }
     }
 
@@ -286,6 +303,7 @@ WidgetCard {
             ListView {
                 id: btList
                 anchors.fill: parent
+                anchors.topMargin: 34
                 model: root.btDevices
                 spacing: 3
                 clip: true
@@ -330,6 +348,28 @@ WidgetCard {
                             }
                         }
                     }
+                }
+            }
+            Rectangle {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                height: 28
+                width: 54
+                radius: Theme.radius
+                color: root.bluetoothScanning ? Theme.mmry : Theme.bgnd
+                border.color: Theme.sptr
+                Text {
+                    id: scanLabel
+                    anchors.centerIn: parent
+                    text: root.bluetoothScanning ? "Stop" : "Scan"
+                    color: root.bluetoothScanning ? Theme.bgnd : Theme.txt2
+                    font.pixelSize: 11
+                    font.family: Theme.font
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: root.bluetoothEnabled
+                    onClicked: root.toggleBluetoothScan()
                 }
             }
             Text {

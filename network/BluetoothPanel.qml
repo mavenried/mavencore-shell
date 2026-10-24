@@ -8,9 +8,11 @@ Item {
 
     required property bool btEnabled
     required property list<var> btDevices
+    required property bool scanning
     signal connectRequested(string mac)
     signal disconnectRequested(string mac)
     signal togglePowerRequested
+    signal toggleScanRequested
 
     implicitHeight: col.implicitHeight
 
@@ -32,9 +34,8 @@ Item {
                 font.family: Theme.font
                 font.bold: true
                 color: Theme.mmry
-            }
-            Item {
                 Layout.fillWidth: true
+                elide: Text.ElideRight
             }
 
             Rectangle {
@@ -61,6 +62,30 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: root.togglePowerRequested()
+                }
+            }
+
+            Rectangle {
+                Layout.preferredWidth: 64
+                Layout.minimumWidth: 52
+                height: scanLbl.height + 10
+                radius: Theme.radius
+                color: root.scanning ? Theme.mmry : Theme.bgnd
+                border.color: Theme.acct
+                border.width: 1
+
+                Text {
+                    id: scanLbl
+                    anchors.centerIn: parent
+                    text: root.scanning ? "Stop" : "Scan"
+                    font.pixelSize: 12
+                    font.family: Theme.font
+                    color: root.scanning ? Theme.bgnd : Theme.txt2
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: root.btEnabled
+                    onClicked: root.toggleScanRequested()
                 }
             }
         }

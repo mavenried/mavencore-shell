@@ -29,6 +29,7 @@ Scope {
 
     // ── Bluetooth data ───────────────────────────────────────────────
     property bool bluetoothEnabled: false
+    property bool bluetoothScanning: false
     property list<var> btDevices: []
 
     Timer {
@@ -83,6 +84,12 @@ Scope {
         }
     }
 
+    Process {
+        id: btScanProc
+        command: ["bluetoothctl"]
+        stdinEnabled: true
+    }
+
     function btConnect(mac) {
         btActionProc.command = ["bluetoothctl", "connect", mac];
         btActionProc.running = true;
@@ -96,6 +103,16 @@ Scope {
     function btTogglePower() {
         btActionProc.command = ["bluetoothctl", "power", root.bluetoothEnabled ? "off" : "on"];
         btActionProc.running = true;
+    }
+
+    function btToggleScan() {
+        root.bluetoothScanning = !root.bluetoothScanning;
+        if (root.bluetoothScanning && !btScanProc.running) {
+            btScanProc.running = true;
+            Qt.callLater(() => btScanProc.write("scan on\n"));
+        } else if (btScanProc.running) {
+            btScanProc.write(root.bluetoothScanning ? "scan on\n" : "scan off\n");
+        }
     }
 
     // ── WiFi connection state ────────────────────────────────────────
@@ -289,9 +306,11 @@ Scope {
                             Layout.preferredHeight: visible ? implicitHeight : 0
                             btEnabled: root.bluetoothEnabled
                             btDevices: root.btDevices
+                            scanning: root.bluetoothScanning
                             onConnectRequested: mac => root.btConnect(mac)
                             onDisconnectRequested: mac => root.btDisconnect(mac)
                             onTogglePowerRequested: root.btTogglePower()
+                            onToggleScanRequested: root.btToggleScan()
                         }
 
                         Rectangle {
