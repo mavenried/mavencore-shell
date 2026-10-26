@@ -11,7 +11,6 @@ WidgetCard {
     required property bool dashboardOpen
 
     property double nowEpoch: Date.now() / 1000
-    visible: dashboardOpen
 
     readonly property real secondsRemaining: Math.max(0, targetEpoch - nowEpoch)
     readonly property int secondsLeft: Math.floor(secondsRemaining)

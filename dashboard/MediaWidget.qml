@@ -42,8 +42,8 @@ WidgetCard {
 
         Rectangle {
             visible: root.hasArt
-            width: 200
-            height: 200
+            width: 220
+            height: 220
             radius: 8
             color: Theme.bgnd
             clip: true
