@@ -37,7 +37,7 @@ ShellRoot {
         todoPath: "/mnt/DATA/Documents/scratches/.mavencore-todo"
         networkIface: "all"
         weatherLocation: "Kochi"
-        countdownTarget: "27 Oct 2026"
+        countdownTarget: "13 Nov 2026"
         countdownName: "ESE"
     }
     NetworkManager {}
